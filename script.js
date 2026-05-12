@@ -631,47 +631,30 @@ function showToast(title, message, isError = false) {
     }, 4000);
 }
 
-// Google Sheets Engine helpers
-function parseCSV(text) {
-    const lines = text.split('\n');
-    return lines.map(line => {
-        const row = [];
-        let inQuotes = false;
-        let cell = '';
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            if (char === '"') inQuotes = !inQuotes;
-            else if (char === ',' && !inQuotes) { row.push(cell.trim()); cell = ''; }
-            else cell += char;
-        }
-        row.push(cell.trim());
-        return row;
-    });
-}
-
-async function syncGoogleSheets(silent = false) {
+// Google Sheets Engine - REENGINEERED TO JSONP TO BYPASS CORS COMPLETELY
+window.handleGvizSync = async function(response) {
     const syncIcon = document.getElementById('sync-icon');
-    if (syncIcon) syncIcon.classList.add('spinning');
-    
     try {
-        const sheetId = '1LRXpvSKhJMJhmCG70I-_v2qXihgNcJfYd9j7byRnW10';
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=190319038`;
-        const res = await fetch(url);
+        if (!response || !response.table || !response.table.rows) {
+            throw new Error("Invalid Gviz payload");
+        }
         
-        if (!res.ok) throw new Error("Network response bad");
-        const text = await res.text();
-        const rows = parseCSV(text);
+        const rows = response.table.rows;
         
-        // Extract names from first column (skip header row)
-        const sheetNames = rows.slice(1)
-            .map(r => r[0] ? r[0].replace(/^"(.*)"$/, '$1').trim() : null)
+        // Filter and extract names safely, guarding against null cells or headers
+        const sheetNames = rows
+            .map(row => {
+                if (!row.c || !row.c[0]) return null;
+                const val = row.c[0].v;
+                return val ? String(val).trim() : null;
+            })
             .filter(n => n && n.toLowerCase() !== 'project name');
-        
+
         const existingNames = new Set(projects.map(p => p.name.trim().toLowerCase()));
         const newNames = [...new Set(sheetNames.filter(n => !existingNames.has(n.toLowerCase())))];
 
         if (newNames.length === 0) {
-            if (!silent) showToast('Google Sheet Sync', 'Board is already up to date.');
+            showToast('Google Sheet Sync', 'No new projects discovered.', false);
             return;
         }
 
@@ -689,13 +672,39 @@ async function syncGoogleSheets(silent = false) {
         }
 
         if (insertCount > 0) {
-            showToast('Sync Success', `Discovered & auto-created ${insertCount} new project(s) from sheet.`);
+            showToast('Sync Success', `Imported ${insertCount} new projects successfully.`);
             await reHydrateAndRender();
         }
     } catch (err) {
-        console.warn("Sync restricted:", err);
-        if (!silent) showToast('Sync Restrict', 'Ensure spreadsheet set to "Anyone with link can view".', true);
+        console.error("Gviz Parse Fail:", err);
+        showToast('Sync Process Fail', 'Could not decode worksheet logic.', true);
     } finally {
         if (syncIcon) syncIcon.classList.remove('spinning');
+        // Clean up dynamic script if found
+        const old = document.getElementById('gviz-sync-script');
+        if(old) old.remove();
     }
+};
+
+async function syncGoogleSheets(silent = false) {
+    const syncIcon = document.getElementById('sync-icon');
+    if (syncIcon) syncIcon.classList.add('spinning');
+    
+    // Purge old script if it exists to allow re-runs
+    const existing = document.getElementById('gviz-sync-script');
+    if (existing) existing.remove();
+
+    const sheetId = '1LRXpvSKhJMJhmCG70I-_v2qXihgNcJfYd9j7byRnW10';
+    // Use direct dynamic script injection (JSONP) which is 100% immune to CORS
+    const script = document.createElement('script');
+    script.id = 'gviz-sync-script';
+    script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGvizSync&gid=190319038&t=${Date.now()}`;
+    
+    script.onerror = () => {
+        if (syncIcon) syncIcon.classList.remove('spinning');
+        if (!silent) showToast('Fetch Blocked', 'Network refused gviz endpoint.', true);
+        script.remove();
+    };
+
+    document.head.appendChild(script);
 }
