@@ -183,25 +183,44 @@ function setupEventListeners() {
     const btnVertical = document.getElementById('btn-view-vertical');
     const btnTable = document.getElementById('btn-view-table');
     const btnSync = document.getElementById('btn-sync-sheet');
+    const btnRecords = document.getElementById('btn-view-records');
+    const btnRecordsHeader = document.getElementById('btn-view-records-header');
 
     if(btnVertical && btnTable) {
         btnVertical.addEventListener('click', () => {
             currentView = 'vertical';
+            selectedRecordProject = null;
             btnVertical.classList.add('active');
             btnTable.classList.remove('active');
+            if(btnRecordsHeader) btnRecordsHeader.classList.remove('active');
             renderActiveView();
         });
         btnTable.addEventListener('click', () => {
             currentView = 'table';
+            selectedRecordProject = null;
             btnTable.classList.add('active');
             btnVertical.classList.remove('active');
+            if(btnRecordsHeader) btnRecordsHeader.classList.remove('active');
             renderActiveView();
         });
     }
 
+    const switchToRecords = () => {
+        currentView = 'records';
+        selectedRecordProject = null;
+        if(btnTable) btnTable.classList.remove('active');
+        if(btnVertical) btnVertical.classList.remove('active');
+        if(btnRecordsHeader) btnRecordsHeader.classList.add('active');
+        renderActiveView();
+    };
+
+    if(btnRecords) btnRecords.addEventListener('click', switchToRecords);
+    if(btnRecordsHeader) btnRecordsHeader.addEventListener('click', switchToRecords);
+
     if(btnSync) {
         btnSync.addEventListener('click', () => syncGoogleSheets());
     }
+
 
     // Theme Toggle
     const btnTheme = document.getElementById('btn-toggle-theme');
@@ -418,6 +437,8 @@ function renderActiveView() {
     updateStats();
     if (currentView === 'table') {
         renderTableView();
+    } else if (currentView === 'records') {
+        renderRecordsView();
     } else {
         renderTimeline();
     }
@@ -902,4 +923,103 @@ function toggleProjectList(btn) {
     const cell = btn.nextElementSibling;
     cell.classList.toggle('hidden');
     btn.classList.toggle('active');
+}
+
+let selectedRecordProject = null;
+
+function renderRecordsView() {
+    timeline.innerHTML = '';
+    timeline.className = 'timeline-container records-view';
+    
+    if (selectedRecordProject) {
+        renderProjectHistory(selectedRecordProject);
+        return;
+    }
+
+    let html = '<div class="records-header"><h2>Project <span class="accent">Archives</span></h2><p>Historical audit trails for every vault item.</p></div>';
+    html += '<div class="folder-grid">';
+    
+    projects.forEach(p => {
+        const hue = getProjectHue(p.name);
+        const taskCount = tasks.filter(t => t.projectId === p.id).length;
+        html += `
+            <div class="folder-card" onclick="viewProjectRecord('${p.id}')">
+                <div class="folder-icon" style="color: hsl(${hue}, 70%, 45%)">
+                    <span class="material-symbols-outlined" style="font-size: 64px;">folder</span>
+                </div>
+                <div class="folder-info">
+                    <div class="folder-name">${p.name}</div>
+                    <div class="folder-meta">${taskCount} Activities Recorded</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    timeline.innerHTML = html;
+}
+
+function viewProjectRecord(id) {
+    selectedRecordProject = id;
+    renderRecordsView();
+}
+
+function clearProjectRecord() {
+    selectedRecordProject = null;
+    renderRecordsView();
+}
+
+function renderProjectHistory(id) {
+    const project = projects.find(p => p.id === id);
+    const projTasks = tasks.filter(t => t.projectId === id);
+    
+    let html = `
+        <div class="history-view animate-slide-up">
+            <div class="history-header">
+                <button class="back-btn" onclick="clearProjectRecord()">
+                    <span class="material-symbols-outlined">arrow_back</span> Back to Archives
+                </button>
+                <div class="history-title">
+                    <h3>${project ? project.name : 'Unknown Project'} <span class="accent">Case File</span></h3>
+                    <p>Complete activity ledger and task history.</p>
+                </div>
+            </div>
+            
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Activity Date</th>
+                            <th>Phase</th>
+                            <th>Task Specification</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    if (projTasks.length === 0) {
+        html += '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--brand-text-muted);">No activity history found for this project.</td></tr>';
+    } else {
+        projTasks.forEach(t => {
+            const date = t.createdAt ? new Date(t.createdAt).toLocaleDateString() : 'N/A';
+            const statusCls = `st-${t.status.toLowerCase()}`;
+            html += `
+                <tr>
+                    <td><span class="history-date">${date}</span></td>
+                    <td><span class="history-phase">${t.phase}</span></td>
+                    <td><span class="history-task">${t.title}</span></td>
+                    <td><span class="task-status-indicator ${statusCls}">${t.status}</span></td>
+                </tr>
+            `;
+        });
+    }
+    
+    html += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    timeline.innerHTML = html;
 }

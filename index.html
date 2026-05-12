@@ -60,6 +60,12 @@
                     </div>
                     <p class="tip-text">Drag projects from here to milestones to advance the cycle.</p>
                 </div>
+                <nav class="nav-menu">
+                    <button id="btn-view-records" class="nav-item">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        <span class="nav-text">Project Records</span>
+                    </button>
+                </nav>
             </div>
         </aside>
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
@@ -77,12 +83,15 @@
                     <h1 class="main-title">Project Life <span class="accent">Cycle</span></h1>
                 </div>
                 <div class="header-right" style="gap: 12px; display: flex; align-items: center;">
-                    <div class="view-toggle-group">
-                        <button id="btn-view-vertical" class="icon-btn active" title="Timeline View">
-                            <span class="material-symbols-outlined">view_agenda</span>
-                        </button>
-                        <button id="btn-view-table" class="icon-btn" title="Table View">
+                    <div class="view-toggles">
+                        <button id="btn-view-table" class="view-btn active" title="Table View">
                             <span class="material-symbols-outlined">table_chart</span>
+                        </button>
+                        <button id="btn-view-vertical" class="view-btn" title="Timeline View">
+                            <span class="material-symbols-outlined">view_column</span>
+                        </button>
+                        <button id="btn-view-records-header" class="view-btn" title="Project Records">
+                            <span class="material-symbols-outlined">folder_shared</span>
                         </button>
                     </div>
                     <div class="divider" style="width:1px; height:24px; background:var(--brand-outline);"></div>
