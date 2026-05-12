@@ -7,6 +7,9 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let projects = [];
 let tasks = [];
 let currentView = 'table';
+let recordsSearchQuery = '';
+let recordsPage = 1;
+const RECORDS_PER_PAGE = 8;
 const COLUMNS = ['Onboarding', 'Design', 'Frontend', 'Backend', 'Beta', 'Live'];
 
 function getProjectHue(str) {
@@ -499,7 +502,7 @@ function renderTimeline() {
                              <div class="project-tooltip">
                                  <p class="tooltip-title">Matrix Health</p>
                                  <div style="margin-bottom:6px;font-weight:800;color:#10b981;">V-Scale: ${progress}%</div>
-                                 ${colProjects.length > 0 ? colProjects.map(p => `<div style="font-size:9px;opacity:0.9;">Ã¢â‚¬Â¢ ${p.name}</div>`).join('') : '<div style="font-size:9px;opacity:0.5;">- Ready -</div>'}
+                                 ${colProjects.length > 0 ? colProjects.map(p => `<div style="font-size:9px;opacity:0.9;">ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ${p.name}</div>`).join('') : '<div style="font-size:9px;opacity:0.5;">- Ready -</div>'}
                              </div>
                          </div>
                          <div style="width: 100px; height: 3px; background: #f3f4f6; border-radius: 10px; margin: 10px auto 0; overflow: hidden;">
@@ -597,7 +600,7 @@ function renderTableView() {
                       ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" 
                       onclick="openProjectModal('${p.id}')">
                     ${p.name}
-                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">Ãƒâ€”</button>
+                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">✕</button>
                 </span>
             `;
         }).join('');
@@ -626,12 +629,22 @@ function renderTableView() {
                     <span class="task-project-tag" style="background-color: ${bg}; color: ${text};" title="Project: ${projName}">${projName}</span>
                     <span class="task-name-txt">${t.title}</span>
                     <div class="table-task-actions">
-                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">Ã¢Å“Å½</button>
-                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">Ã¢Å“â€¢</button>
+                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">✎</button>
+                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">✕</button>
                     </div>
                 </div>
             `;
-        }).join('') || '<span class="txt-muted">No tasks assigned</span>';
+        }).join('');
+
+        const taskToggleHTML = `
+            <div class="task-toggle-container">
+                <button class="task-count-toggle" onclick="toggleTaskList(this)">
+                    <span class="material-symbols-outlined">assignment</span>
+                    ${colTasks.length} Tasks
+                </button>
+                <div class="table-tasks-cell hidden">${tasksHTML || '<span class="txt-muted">No tasks assigned</span>'}</div>
+            </div>
+        `;
 
         const openCount = colTasks.filter(t => t.status === 'Open').length;
         const progCount = colTasks.filter(t => t.status === 'In Progress').length;
@@ -666,7 +679,227 @@ function renderTableView() {
                     <div class="table-projects-cell-wrapper">${projectToggleHTML}</div>
                 </td>
                 <td>
-                    <div class="table-tasks-cell">${tasksHTML}</div>
+                    <div class="table-tasks-cell-wrapper">${taskToggleHTML}</div>
+                </td>
+                <td>
+                    <button class="table-add-btn" onclick="openTaskModal('${col}')" title="Add Task">
+                        <span class="material-symbols-outlined">add_circle</span>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    timeline.innerHTML = html;
+
+    document.querySelectorAll('.milestone-tr').forEach(row => {
+        row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('row-drag-over'); });
+        row.addEventListener('dragleave', () => row.classList.remove('row-drag-over'));
+        row.addEventListener('drop', (e) => {
+            e.preventDefault(); row.classList.remove('row-drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            moveProject(id, row.dataset.phase);
+        });
+    });
+}).join('');
+
+        const projectToggleHTML = \
+            <div class="project-toggle-container">
+                <button class="project-count-toggle" onclick="toggleProjectList(this)">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    \ Projects
+                </button>
+                <div class="table-projects-cell hidden">\</div>
+            </div>
+        \;
+
+        const tasksHTML = colTasks.map(t => {
+            const stCls = \st-\\;
+            const proj = projects.find(p => p.id === t.projectId);
+            const projName = proj ? proj.name : 'Unknown';
+            const hue = proj ? getProjectHue(projName) : 0;
+            const bg = proj ? \hsl(\, 85%, 95%)\ : '#F1F5F9';
+            const text = proj ? \hsl(\, 90%, 25%)\ : '#475569';
+
+            return \
+                <div class="table-task-row">
+                    <span class="task-status-indicator \" onclick="updateTaskStatus('\')" title="Toggle status">\</span>
+                    <span class="task-project-tag" style="background-color: \; color: \;" title="Project: \">\</span>
+                    <span class="task-name-txt">\</span>
+                    <div class="table-task-actions">
+                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('\', '\')" title="Edit Task">✎</button>
+                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('\')" title="Delete Task">✕</button>
+                    </div>
+                </div>
+            \;
+        }).join('');
+
+        const taskToggleHTML = \
+            <div class="task-toggle-container">
+                <button class="task-count-toggle" onclick="toggleTaskList(this)">
+                    <span class="material-symbols-outlined">assignment</span>
+                    \ Tasks
+                </button>
+                <div class="table-tasks-cell hidden">\</div>
+            </div>
+        \;
+
+        const openCount = colTasks.filter(t => t.status === 'Open').length;
+        const progCount = colTasks.filter(t => t.status === 'In Progress').length;
+        const closedCount = colTasks.filter(t => t.status === 'Closed').length;
+        const total = colTasks.length || 1;
+        
+        const openPct = Math.round((openCount / total) * 100);
+        const progPct = Math.round((progCount / total) * 100);
+        const closedPct = Math.round((closedCount / total) * 100);
+
+        html += \
+            <tr class="milestone-tr" data-phase="\">
+                <td>
+                    <div class="td-phase-header theme-\">
+                        <span class="phase-num">\</span>
+                        <span class="phase-name">\ <span class="phase-count-badge">\</span></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="dist-tooltip">
+                        <span><i class="dot dist-open"></i>\</span>
+                        <span><i class="dot dist-progress"></i>\</span>
+                        <span><i class="dot dist-closed"></i>\</span>
+                    </div>
+                    <div class="task-dist-container" title="Tasks: \ Open, \ In Progress, \ Closed">
+                        <div class="dist-seg dist-open" style="width:\%"></div>
+                        <div class="dist-seg dist-progress" style="width:\%"></div>
+                        <div class="dist-seg dist-closed" style="width:\%"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-projects-cell-wrapper">\</div>
+                </td>
+                <td>
+                    <div class="table-tasks-cell-wrapper">\</div>
+                </td>
+                <td>
+                    <button class="table-add-btn" onclick="openTaskModal('\')" title="Add Task">
+                        <span class="material-symbols-outlined">add_circle</span>
+                    </button>
+                </td>
+            </tr>
+        \;
+    });
+
+    html += \
+                </tbody>
+            </table>
+        </div>
+    \;
+    timeline.innerHTML = html;
+
+    document.querySelectorAll('.milestone-tr').forEach(row => {
+        row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('row-drag-over'); });
+        row.addEventListener('dragleave', () => row.classList.remove('row-drag-over'));
+        row.addEventListener('drop', (e) => {
+            e.preventDefault(); row.classList.remove('row-drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            moveProject(id, row.dataset.phase);
+        });
+    });
+}, 85%, 95%)`;
+            const border = `hsl(${hue}, 50%, 85%)`;
+            const text = `hsl(${hue}, 90%, 25%)`;
+            
+            return `
+                <span class="table-proj-chip" 
+                      style="background-color: ${bg}; border-color: ${border}; color: ${text};"
+                      draggable="true" 
+                      ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" 
+                      onclick="openProjectModal('${p.id}')">
+                    ${p.name}
+                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">ÃƒÆ’Ã¢â‚¬â€</button>
+                </span>
+            `;
+        }).join('');
+
+        const projectToggleHTML = `
+            <div class="project-toggle-container">
+                <button class="project-count-toggle" onclick="toggleProjectList(this)">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    ${colProjects.length} Projects
+                </button>
+                <div class="table-projects-cell hidden">${projectsHTML || '<span class="txt-muted">No projects assigned</span>'}</div>
+            </div>
+        `;
+
+        const tasksHTML = colTasks.map(t => {
+            const stCls = \st-\\;
+            const proj = projects.find(p => p.id === t.projectId);
+            const projName = proj ? proj.name : 'Unknown';
+            const hue = proj ? getProjectHue(projName) : 0;
+            const bg = proj ? \hsl(\, 85%, 95%)\ : '#F1F5F9';
+            const text = proj ? \hsl(\, 90%, 25%)\ : '#475569';
+
+            return \
+                <div class="table-task-row">
+                    <span class="task-status-indicator \" onclick="updateTaskStatus('\')" title="Toggle status">\</span>
+                    <span class="task-project-tag" style="background-color: \; color: \;" title="Project: \">\</span>
+                    <span class="task-name-txt">\</span>
+                    <div class="table-task-actions">
+                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('\', '\')" title="Edit Task">✎</button>
+                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('\')" title="Delete Task">✕</button>
+                    </div>
+                </div>
+            \;
+        }).join('');
+
+        const taskToggleHTML = \
+            <div class="task-toggle-container">
+                <button class="task-count-toggle" onclick="toggleTaskList(this)">
+                    <span class="material-symbols-outlined">assignment</span>
+                    \ Tasks
+                </button>
+                <div class="table-tasks-cell hidden">\</div>
+            </div>
+        \;
+
+        const openCount = colTasks.filter(t => t.status === 'Open').length;
+        const progCount = colTasks.filter(t => t.status === 'In Progress').length;
+        const closedCount = colTasks.filter(t => t.status === 'Closed').length;
+        const total = colTasks.length || 1;
+        
+        const openPct = Math.round((openCount / total) * 100);
+        const progPct = Math.round((progCount / total) * 100);
+        const closedPct = Math.round((closedCount / total) * 100);
+
+        html += `
+            <tr class="milestone-tr" data-phase="${col}">
+                <td>
+                    <div class="td-phase-header theme-${idx+1}">
+                        <span class="phase-num">${idx+1}</span>
+                        <span class="phase-name">${col} <span class="phase-count-badge">${colProjects.length}</span></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="dist-tooltip">
+                        <span><i class="dot dist-open"></i>${openCount}</span>
+                        <span><i class="dot dist-progress"></i>${progCount}</span>
+                        <span><i class="dot dist-closed"></i>${closedCount}</span>
+                    </div>
+                    <div class="task-dist-container" title="Tasks: ${openCount} Open, ${progCount} In Progress, ${closedCount} Closed">
+                        <div class="dist-seg dist-open" style="width:${openPct}%"></div>
+                        <div class="dist-seg dist-progress" style="width:${progPct}%"></div>
+                        <div class="dist-seg dist-closed" style="width:${closedPct}%"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-projects-cell-wrapper">${projectToggleHTML}</div>
+                </td>
+                <td>
+                    <div class="table-tasks-cell-wrapper">${taskToggleHTML}</div>
                 </td>
                 <td>
                     <button class="table-add-btn" onclick="openTaskModal('${col}')" title="Add Task">
@@ -951,10 +1184,35 @@ function renderRecordsView() {
         return;
     }
 
-    let html = '<div class="records-header"><h2>Project <span class="accent">Archives</span></h2><p>Historical audit trails for every vault item.</p></div>';
+    const filtered = projects.filter(p => p.name.toLowerCase().includes(recordsSearchQuery.toLowerCase()));
+    const totalPages = Math.ceil(filtered.length / RECORDS_PER_PAGE);
+    const start = (recordsPage - 1) * RECORDS_PER_PAGE;
+    const paged = filtered.slice(start, start + RECORDS_PER_PAGE);
+
+    let html = `
+        <div class="records-header">
+            <h2>Project <span class="accent">Archives</span></h2>
+            <p>Historical audit trails for every vault item.</p>
+        </div>
+        
+        <div class="records-controls">
+            <div class="records-search-wrapper">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" class="records-search-input" placeholder="Search case files..." 
+                       value="${recordsSearchQuery}" oninput="handleRecordsSearch(this.value)">
+            </div>
+            
+            <div class="pagination-controls">
+                <button class="pag-btn" ${recordsPage === 1 ? 'disabled' : ''} onclick="changeRecordsPage(${recordsPage - 1})">Previous</button>
+                <span class="pag-info">Page ${recordsPage} of ${totalPages || 1}</span>
+                <button class="pag-btn" ${recordsPage === totalPages || totalPages === 0 ? 'disabled' : ''} onclick="changeRecordsPage(${recordsPage + 1})">Next</button>
+            </div>
+        </div>
+    `;
+
     html += '<div class="folder-grid">';
     
-    projects.forEach(p => {
+    paged.forEach(p => {
         const hue = getProjectHue(p.name);
         const taskCount = tasks.filter(t => t.projectId === p.id).length;
         html += `
@@ -972,6 +1230,128 @@ function renderRecordsView() {
     
     html += '</div>';
     timeline.innerHTML = html;
+
+    const btnRecords = document.getElementById('btn-view-records');
+    if (btnRecords) btnRecords.classList.add('active');
+}
+
+    const filtered = projects.filter(p => p.name.toLowerCase().includes(recordsSearchQuery.toLowerCase()));
+    const totalPages = Math.ceil(filtered.length / RECORDS_PER_PAGE);
+    const start = (recordsPage - 1) * RECORDS_PER_PAGE;
+    const paged = filtered.slice(start, start + RECORDS_PER_PAGE);
+
+    let html = \
+        <div class="records-header">
+            <h2>Project <span class="accent">Archives</span></h2>
+            <p>Historical audit trails for every vault item.</p>
+        </div>
+        
+        <div class="records-controls">
+            <div class="records-search-wrapper">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" class="records-search-input" placeholder="Search case files..." 
+                       value="\" oninput="handleRecordsSearch(this.value)">
+            </div>
+            
+            <div class="pagination-controls">
+                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Previous</button>
+                <span class="pag-info">Page \ of \</span>
+                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Next</button>
+            </div>
+        </div>
+    \;
+
+    html += '<div class="folder-grid">';
+    
+    paged.forEach(p => {
+        const hue = getProjectHue(p.name);
+        const taskCount = tasks.filter(t => t.projectId === p.id).length;
+        html += \
+            <div class="folder-card" onclick="viewProjectRecord('\')">
+                <div class="folder-icon" style="color: hsl(\, 70%, 45%)">
+                    <span class="material-symbols-outlined" style="font-size: 64px;">folder</span>
+                </div>
+                <div class="folder-info">
+                    <div class="folder-name">\</div>
+                    <div class="folder-meta">\ Activities Recorded</div>
+                </div>
+            </div>
+        \;
+    });
+    
+    html += '</div>';
+    timeline.innerHTML = html;
+
+    const btnRecords = document.getElementById('btn-view-records');
+    if (btnRecords) btnRecords.classList.add('active');
+}
+
+    const filtered = projects.filter(p => p.name.toLowerCase().includes(recordsSearchQuery.toLowerCase()));
+    const totalPages = Math.ceil(filtered.length / RECORDS_PER_PAGE);
+    const start = (recordsPage - 1) * RECORDS_PER_PAGE;
+    const paged = filtered.slice(start, start + RECORDS_PER_PAGE);
+
+    let html = \
+        <div class="records-header">
+            <h2>Project <span class="accent">Archives</span></h2>
+            <p>Historical audit trails for every vault item.</p>
+        </div>
+        
+        <div class="records-controls">
+            <div class="records-search-wrapper">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" class="records-search-input" placeholder="Search case files..." 
+                       value="\" oninput="handleRecordsSearch(this.value)">
+            </div>
+            
+            <div class="pagination-controls">
+                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Previous</button>
+                <span class="pag-info">Page \ of \</span>
+                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Next</button>
+            </div>
+        </div>
+    \;
+
+    html += '<div class="folder-grid">';
+    
+    paged.forEach(p => {
+        const hue = getProjectHue(p.name);
+        const taskCount = tasks.filter(t => t.projectId === p.id).length;
+        html += \
+            <div class="folder-card" onclick="viewProjectRecord('\')">
+                <div class="folder-icon" style="color: hsl(\, 70%, 45%)">
+                    <span class="material-symbols-outlined" style="font-size: 64px;">folder</span>
+                </div>
+                <div class="folder-info">
+                    <div class="folder-name">\</div>
+                    <div class="folder-meta">\ Activities Recorded</div>
+                </div>
+            </div>
+        \;
+    });
+    
+    html += '</div>';
+    timeline.innerHTML = html;
+
+    const btnRecords = document.getElementById('btn-view-records');
+    if (btnRecords) btnRecords.classList.add('active');
+}
+
+function handleRecordsSearch(val) {
+    recordsSearchQuery = val;
+    recordsPage = 1;
+    renderRecordsView();
+}
+
+function changeRecordsPage(p) {
+    recordsPage = p;
+    renderRecordsView();
+}
+
+function toggleTaskList(btn) {
+    const cell = btn.nextElementSibling;
+    cell.classList.toggle('hidden');
+    btn.classList.toggle('active');
 }
 
 function viewProjectRecord(id) {
