@@ -1621,3 +1621,28 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     height: 100dvh;
     overflow: hidden;
 }
+
+/* --- COLLAPSED SIDEBAR SEARCH ICON REVEAL --- */
+.sidebar.collapsed .search-container {
+    display: flex !important;
+    justify-content: center;
+    padding: 0;
+    margin: 10px 0;
+}
+.sidebar.collapsed .search-container #project-search {
+    display: none !important;
+}
+.sidebar.collapsed .search-icon {
+    margin: 0 !important;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.sidebar.collapsed .search-icon:hover {
+    transform: scale(1.2);
+    color: var(--brand-primary);
+}
+
+/* --- COLLAPSED TOOLTIP ENHANCEMENT --- */
+.sidebar.collapsed .project-card:hover {
+    box-shadow: 0 0 0 2px var(--brand-primary);
+}

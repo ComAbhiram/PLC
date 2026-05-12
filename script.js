@@ -358,6 +358,7 @@ function getProjectHue(str) {
         const card = document.createElement('div');
         card.className = 'project-card project-pill';
         card.draggable = true;
+        card.title = project.name;
         
         // Deterministic aesthetic coloring
         const hue = getProjectHue(project.name);
