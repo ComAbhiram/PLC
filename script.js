@@ -675,10 +675,12 @@ function openTaskModal(phase = 'Onboarding', taskId = null) {
     // Force dynamic option generation once
     const buildOpts = () => {
         const query = filterInput.value.toLowerCase();
-        projectSelect.innerHTML = projects
+        const options = projects
             .filter(p => p.name.toLowerCase().includes(query))
             .map(p => `<option value="${p.id}">${p.name}</option>`)
             .join('');
+        
+        projectSelect.innerHTML = options || '<option disabled>No matches found</option>';
     };
     
     filterInput.value = '';
