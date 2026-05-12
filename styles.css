@@ -14,9 +14,9 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
-body { background-color: var(--brand-background); color: var(--brand-text); min-height: 100dvh; display: flex; flex-direction: column; overflow-x: hidden; font-size: 16px; letter-spacing: -0.01em; line-height: 1.6; }
+body { background-color: var(--brand-background); color: var(--brand-text); height: 100dvh; overflow: hidden; display: flex; flex-direction: column; font-size: 16px; letter-spacing: -0.01em; line-height: 1.6; }
 /* Modern responsive layout container */
-.app-container { display: flex; flex: 1; height: 100dvh; width: 100vw; overflow: hidden; position: relative; }
+.app-container { display: flex; flex: 1; height: 100%; width: 100vw; overflow: hidden; position: relative; }
 
 .sidebar { 
     width: 300px; 
@@ -1437,4 +1437,77 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
         left: 10px !important;
         width: auto !important;
     }
+}
+
+/* --- CRITICAL SIDEBAR & LAYOUT FIXES --- */
+.sidebar {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    flex-shrink: 0 !important;
+}
+.sidebar.collapsed {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+}
+
+.logo {
+    white-space: nowrap;
+    overflow: hidden;
+}
+.logo-text {
+    flex-shrink: 0;
+}
+
+.sidebar-section {
+    width: 100%;
+    overflow: hidden;
+}
+
+.section-header {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 20px;
+}
+
+/* Ensure main content takes remaining space correctly */
+.main-content {
+    flex: 1;
+    min-width: 0; /* Prevents flex items from overflowing parent */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fix for the huge gap/footer issue */
+.content-wrapper {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    padding: 30px 20px;
+}
+
+.bottom-footer {
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: white;
+    border-top: 1px solid var(--brand-outline);
+}
+
+/* Fix table view container to fill height */
+.table-view-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.milestone-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 12px;
 }
