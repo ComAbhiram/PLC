@@ -164,7 +164,19 @@ function setupEventListeners() {
         e.preventDefault();
         projectList.style.background = 'transparent';
         const id = e.dataTransfer.getData('text/plain');
-        if (id) moveProject(id, null);
+        moveProject(id, null);
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            reHydrateAndRender();
+        }
+        if (e.altKey && e.key === 'n') {
+            e.preventDefault();
+            openProjectModal();
+        }
     });
 
     // View Toggles
@@ -403,11 +415,22 @@ function getTimeSpan(iso) {
 }
 
 function renderActiveView() {
+    updateStats();
     if (currentView === 'table') {
         renderTableView();
     } else {
         renderTimeline();
     }
+}
+
+function updateStats() {
+    const totalProjects = projects.length;
+    const liveProjects = projects.filter(p => p.column === 'Live').length;
+    const activeTasks = tasks.filter(t => t.status !== 'Closed').length;
+
+    document.getElementById('stat-total-projects').textContent = totalProjects;
+    document.getElementById('stat-live-count').textContent = liveProjects;
+    document.getElementById('stat-task-count').textContent = activeTasks;
 }
 
 function renderTimeline() {
@@ -525,12 +548,15 @@ function renderTableView() {
         const closed = colTasks.filter(t => t.status === 'Closed').length;
         const progress = colTasks.length > 0 ? Math.round((closed / colTasks.length) * 100) : 0;
         
-        const projectsHTML = colProjects.map(p => `
-            <span class="table-proj-chip" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" onclick="openProjectModal('${p.id}')">
-                ${p.name}
-                <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">×</button>
-            </span>
-        `).join('') || '<span class="txt-muted">-</span>';
+        const projectsHTML = colProjects.map(p => {
+            const prioClass = p.priority ? `priority-${p.priority.toLowerCase()}` : '';
+            return `
+                <span class="table-proj-chip ${prioClass}" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" onclick="openProjectModal('${p.id}')">
+                    ${p.name}
+                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">×</button>
+                </span>
+            `;
+        }).join('') || '<span class="txt-muted">-</span>';
 
         const tasksHTML = colTasks.map(t => {
             const stCls = `st-${t.status.toLowerCase()}`;
