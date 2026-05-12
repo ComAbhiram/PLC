@@ -1865,3 +1865,38 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 [data-theme="dark"] .task-action-ico {
     background: #1E293B;
 }
+
+/* --- TASK ALIGNMENT REPAIR --- */
+.table-task-row {
+    grid-template-columns: 80px auto 1fr 60px !important;
+    gap: 16px !important;
+    padding: 10px 14px !important;
+}
+
+.task-project-tag {
+    width: auto !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    background: #E2E8F0 !important;
+    color: #334155 !important;
+    padding: 4px 12px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+
+.task-name-txt {
+    overflow: visible !important;
+    white-space: normal !important; /* Allow wrapping so it never 'disappears' */
+    text-overflow: clip !important;
+    line-height: 1.4;
+    display: block !important;
+}
+
+.table-tasks-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
