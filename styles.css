@@ -1595,3 +1595,29 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
         min-width: 100% !important;
     }
 }
+
+/* --- FINAL SCROLL STABILIZATION --- */
+.content-wrapper {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px;
+    height: 100%;
+}
+
+/* Allow the table card to fit its content but not block scrolling */
+.milestone-table-wrapper {
+    flex-shrink: 0; 
+    height: auto !important;
+    min-height: min-content;
+}
+
+/* Ensure the main content doesn't hide the bottom of the table */
+.main-content {
+    height: 100dvh;
+    overflow: hidden;
+}
