@@ -9,6 +9,15 @@ let tasks = [];
 let currentView = 'table'; // 'table' is the sole interface now
 const COLUMNS = ['Onboarding', 'Design', 'Frontend', 'Backend', 'Beta', 'Live'];
 
+function getProjectHue(str) {
+    let hash = 0;
+    const cleanStr = str ? String(str) : \"default\";
+    for (let i = 0; i < cleanStr.length; i++) {
+        hash = cleanStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash) % 360;
+}
+
 // DOM Elements Handlers
 const sidebar = document.getElementById('sidebar');
 const toggleSidebarBtn = document.getElementById('toggle-sidebar');
