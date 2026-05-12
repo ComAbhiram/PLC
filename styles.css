@@ -1511,3 +1511,37 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     overflow-y: auto;
     border-radius: 12px;
 }
+
+/* --- TABLE CARD HEIGHT FIX --- */
+.milestone-table-wrapper {
+    flex: 0 1 auto !important; /* Stop forcing growth to fill screen */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04), 0 0 0 1px var(--brand-outline);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure the wrapper doesn't have an internal white gap if table is short */
+.milestone-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center; /* Center the table card horizontally */
+    align-items: flex-start; /* Align to top to avoid vertical stretching */
+    padding: 40px 20px;
+    background-color: var(--brand-background); /* Ensure consistent background */
+}
+
+/* Fix for dark mode gap */
+[data-theme="dark"] .milestone-table-wrapper {
+    background: #1E293B !important;
+}
