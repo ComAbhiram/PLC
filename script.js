@@ -560,9 +560,12 @@ function renderTableView() {
 
         const tasksHTML = colTasks.map(t => {
             const stCls = `st-${t.status.toLowerCase()}`;
+            const proj = projects.find(p => p.id === t.projectId);
+            const projName = proj ? proj.name : 'Unknown';
             return `
                 <div class="table-task-row">
                     <span class="task-status-indicator ${stCls}" onclick="updateTaskStatus('${t.id}')" title="Toggle status">${t.status}</span>
+                    <span class="task-project-tag" title="Project: ${projName}">${projName}</span>
                     <span class="task-name-txt">${t.title}</span>
                     <div class="table-task-actions">
                         <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">✎</button>
@@ -586,7 +589,7 @@ function renderTableView() {
                 <td>
                     <div class="td-phase-header theme-${idx+1}">
                         <span class="phase-num">${idx+1}</span>
-                        <span class="phase-name">${col}</span>
+                        <span class="phase-name">${col} <span class="phase-count-badge">${colProjects.length}</span></span>
                     </div>
                 </td>
                 <td>

@@ -1737,3 +1737,37 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 [data-theme="dark"] .priority-high { background: rgba(153, 27, 27, 0.2); color: #FCA5A5; }
 [data-theme="dark"] .priority-medium { background: rgba(146, 64, 14, 0.2); color: #FCD34D; }
 [data-theme="dark"] .priority-low { background: rgba(22, 101, 52, 0.2); color: #86EFAC; }
+
+/* --- TASK PROJECT ATTRIBUTION --- */
+.task-project-tag {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #F1F5F9;
+    color: #475569;
+    text-transform: uppercase;
+    margin-right: 6px;
+    border: 1px solid var(--brand-outline);
+    display: inline-block;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+[data-theme="dark"] .task-project-tag {
+    background: #334155;
+    color: #CBD5E1;
+}
+
+.phase-count-badge {
+    font-size: 10px;
+    background: rgba(0,0,0,0.05);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-weight: 700;
+    color: var(--brand-text-muted);
+}

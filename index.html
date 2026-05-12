@@ -224,7 +224,20 @@
                     </div>
                     <div class="form-group">
                         <label for="task-title">Task Specification <span style="color:#E11D48">*</span></label>
-                        <input type="text" id="task-title" placeholder="What needs to be done?" required maxlength="128">
+                        <input type="text" id="task-title" list="task-suggestions" placeholder="Select or type task..." required maxlength="128">
+                        <datalist id="task-suggestions">
+                            <option value="Initial Briefing">
+                            <option value="Requirement Gathering">
+                            <option value="Wireframe Approval">
+                            <option value="UI Design Phase">
+                            <option value="API Integration">
+                            <option value="Database Schema Setup">
+                            <option value="Frontend Components">
+                            <option value="QA Testing">
+                            <option value="Client Feedback Round">
+                            <option value="Production Deployment">
+                            <option value="User Training">
+                        </datalist>
                     </div>
                     <div class="form-group">
                         <label for="task-labels">Labels</label>
