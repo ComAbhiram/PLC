@@ -838,9 +838,19 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 .milestone-tr {
     transition: background 0.2s;
 }
-.milestone-tr:hover {
-    background: #FAFBFF;
-}
+.milestone-tr:nth-child(1) { background-color: rgba(79, 70, 229, 0.03); }
+.milestone-tr:nth-child(2) { background-color: rgba(147, 51, 234, 0.03); }
+.milestone-tr:nth-child(3) { background-color: rgba(219, 39, 119, 0.03); }
+.milestone-tr:nth-child(4) { background-color: rgba(217, 119, 6, 0.03); }
+.milestone-tr:nth-child(5) { background-color: rgba(5, 150, 105, 0.03); }
+.milestone-tr:nth-child(6) { background-color: rgba(71, 85, 105, 0.03); }
+
+.milestone-tr:nth-child(1):hover { background-color: rgba(79, 70, 229, 0.08); }
+.milestone-tr:nth-child(2):hover { background-color: rgba(147, 51, 234, 0.08); }
+.milestone-tr:nth-child(3):hover { background-color: rgba(219, 39, 119, 0.08); }
+.milestone-tr:nth-child(4):hover { background-color: rgba(217, 119, 6, 0.08); }
+.milestone-tr:nth-child(5):hover { background-color: rgba(5, 150, 105, 0.08); }
+.milestone-tr:nth-child(6):hover { background-color: rgba(71, 85, 105, 0.08); }
 
 .milestone-tr.row-drag-over {
     background: #EEF2FF;
