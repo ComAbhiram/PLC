@@ -273,6 +273,16 @@ function renderSidebar(searchQuery = '', sortBy = 'newest') {
     projectList.innerHTML = '';
     projectCountBadge.textContent = projects.length;
 
+// Deterministic Hash Color Map for Sidebar Differentiation
+function getProjectHue(str) {
+    let hash = 0;
+    const cleanStr = str ? String(str) : "default";
+    for (let i = 0; i < cleanStr.length; i++) {
+        hash = cleanStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash) % 360;
+}
+
     let processed = projects.filter(p => 
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.type && p.type.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -306,11 +316,20 @@ function renderSidebar(searchQuery = '', sortBy = 'newest') {
         card.className = 'project-card project-pill';
         card.draggable = true;
         
+        // Deterministic aesthetic coloring
+        const hue = getProjectHue(project.name);
+        card.style.backgroundColor = `hsl(${hue}, 85%, 95%)`;
+        card.style.borderColor = `hsl(${hue}, 50%, 85%)`;
+        card.style.color = `hsl(${hue}, 90%, 25%)`;
+
+        const initials = (project.name || "??").trim().substring(0, 2).toUpperCase();
+
         card.innerHTML = `
-            <span class="project-name" title="${project.name}">${highlight(project.name)}</span>
+            <div class="project-collapsed-avatar">${initials}</div>
+            <span class="project-name" title="${project.name}" style="color: inherit;">${highlight(project.name)}</span>
             <div class="project-card-actions">
-                <button class="mini-btn edit-q"><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
-                <button class="mini-btn del-q"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button>
+                <button class="mini-btn edit-q" style="color: inherit;"><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
+                <button class="mini-btn del-q" style="color: inherit;"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button>
             </div>
         `;
 

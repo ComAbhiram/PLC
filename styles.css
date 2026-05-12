@@ -1075,3 +1075,27 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 .row-drag-over {
     background-color: #EEF2FF !important; /* Light indigo highlights while dragging projects over row */
 }
+
+/* Collapsed Sidebar Initials Handler */
+.project-collapsed-avatar {
+    display: none; /* Hidden normally */
+}
+.sidebar.collapsed .project-card .project-collapsed-avatar {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    font-family: 'Outfit', sans-serif;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+}
+.sidebar.collapsed .project-card {
+    overflow: hidden;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    border-radius: 50% !important;
+}
