@@ -2263,3 +2263,35 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     border-color: var(--brand-primary);
     color: var(--brand-primary);
 }
+/* --- MILESTONE TABLE STRUCTURAL REFINEMENT --- */
+.milestone-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.milestone-table th {
+    background: #F8FAFC;
+    padding: 16px 12px !important;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #64748B;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--brand-outline);
+    white-space: nowrap !important; /* Ensure titles don't wrap/truncate */
+}
+
+.milestone-table td {
+    padding: 20px 12px !important;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--brand-outline);
+}
+
+/* Ensure the actions column has enough breathing room */
+.milestone-table th:last-child, 
+.milestone-table td:last-child {
+    text-align: center;
+    min-width: 120px;
+}
