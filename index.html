@@ -177,11 +177,15 @@
                     </button>
                 </div>
                 <form id="task-form" class="modal-form">
+                    <input type="hidden" id="edit-task-id">
                     <div class="form-group">
                         <label for="task-project-id">Assign to Project <span style="color:#E11D48">*</span></label>
-                        <select id="task-project-id" required>
-                            <!-- Options will be injected here -->
-                        </select>
+                        <div class="searchable-select-wrapper">
+                            <input type="text" id="task-project-search" class="mini-search-input" placeholder="Filter projects..." style="margin-bottom: 6px; font-size: 11px; padding: 6px 10px; border-radius: 6px;">
+                            <select id="task-project-id" required style="width: 100%; max-width: 300px;">
+                                <!-- Options dynamic -->
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Target Phase</label>

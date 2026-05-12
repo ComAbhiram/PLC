@@ -990,3 +990,82 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     overflow-y: auto !important;
     max-height: calc(100% - 200px); /* Force constraint to ensure scrolling triggers */
 }
+
+/* Table Chip: Remove Mechanics */
+.table-proj-chip {
+    position: relative;
+    cursor: grab;
+    padding-right: 24px !important; /* Room for remove btn */
+    transition: transform 0.1s;
+}
+.table-proj-chip:active { cursor: grabbing; transform: scale(0.96); }
+
+.chip-remove-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+}
+.table-proj-chip:hover .chip-remove-btn { opacity: 1; }
+.chip-remove-btn:hover { color: #E11D48; }
+
+/* Table Tasks Inline Actions */
+.table-task-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-right: 40px; /* Spacer for hover actions */
+}
+.table-task-actions {
+    position: absolute;
+    right: 4px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.table-task-row:hover .table-task-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.task-action-ico {
+    background: #f1f5f9;
+    border: none;
+    color: #64748b;
+    font-size: 11px;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.15s;
+}
+.task-action-ico:hover { background: #e2e8f0; color: #4f46e5; }
+.task-action-ico.danger:hover { background: #fee2e2; color: #ef4444; }
+
+/* Inline Form Micro-styles */
+.mini-search-input {
+    border: 1px solid var(--brand-outline);
+    background: white;
+    outline: none;
+    transition: border 0.2s;
+    width: 100%;
+    max-width: 300px;
+}
+.mini-search-input:focus { border-color: var(--brand-primary); }
+
+.row-drag-over {
+    background-color: #EEF2FF !important; /* Light indigo highlights while dragging projects over row */
+}

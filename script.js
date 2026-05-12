@@ -111,13 +111,18 @@ function setupEventListeners() {
     // Task Form Submit
     taskForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const taskId = document.getElementById('edit-task-id').value;
         const projectId = document.getElementById('task-project-id').value;
         const phase = document.getElementById('task-phase').value;
         const title = document.getElementById('task-title').value;
         const labelsRaw = document.getElementById('task-labels').value;
         const labels = labelsRaw.split(',').map(l => l.trim()).filter(l => l !== '');
 
-        await addTask(projectId, phase, title, labels);
+        if (taskId) {
+            await updateTask(taskId, { project_id: projectId, phase, title, labels });
+        } else {
+            await addTask(projectId, phase, title, labels);
+        }
         closeModals();
     });
 
@@ -131,6 +136,21 @@ function setupEventListeners() {
     const sortSelect = document.getElementById('project-sort');
     sortSelect.addEventListener('change', (e) => {
         renderSidebar(searchInput.value, e.target.value);
+    });
+
+    // Drop zone for clearing milestones (returning project to vault)
+    projectList.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        projectList.style.background = '#F1F5F9';
+    });
+    projectList.addEventListener('dragleave', () => {
+        projectList.style.background = 'transparent';
+    });
+    projectList.addEventListener('drop', (e) => {
+        e.preventDefault();
+        projectList.style.background = 'transparent';
+        const id = e.dataTransfer.getData('text/plain');
+        if (id) moveProject(id, null);
     });
 
     // View Toggles
@@ -198,13 +218,14 @@ async function moveProject(id, column) {
     const proj = projects.find(p => p.id === id);
     if (!proj || proj.column === column) return;
 
-    if (confirm(`Move "${proj.name}" to phase: ${column}?`)) {
+    const targetStr = column ? `phase: ${column}` : "the Project Vault";
+    if (confirm(`Move "${proj.name}" to ${targetStr}?`)) {
         const { error } = await supabaseClient.from('projects')
             .update({ phase_column: column, updated_at: new Date().toISOString() })
             .eq('id', id);
         
-        if (error) showToast('Transfer Blocked', 'Phase shift failed at source.', true);
-        else showToast('Phase Advance', `Advancing status to ${column}`);
+        if (error) showToast('Transfer Blocked', 'Failed to move project.', true);
+        else showToast('Location Refined', column ? `Moved to ${column}` : 'Returned to Vault');
         await reHydrateAndRender();
     }
 }
@@ -220,6 +241,15 @@ async function addTask(projectId, phase, title, labels) {
     }]);
     if (error) showToast('Task Fail', 'Could not inject action item.', true);
     else showToast('Created', 'New action item cataloged.');
+    await reHydrateAndRender();
+}
+
+async function updateTask(id, updates) {
+    const { error } = await supabaseClient.from('tasks')
+        .update(updates)
+        .eq('id', id);
+    if (error) showToast('Sync Failure', 'Task revisions could not be posted.', true);
+    else showToast('Updated', 'Record committed to database.');
     await reHydrateAndRender();
 }
 
@@ -436,8 +466,9 @@ function renderTableView() {
         const progress = colTasks.length > 0 ? Math.round((closed / colTasks.length) * 100) : 0;
         
         const projectsHTML = colProjects.map(p => `
-            <span class="table-proj-chip" onclick="openProjectModal('${p.id}')">
+            <span class="table-proj-chip" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" onclick="openProjectModal('${p.id}')">
                 ${p.name}
+                <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">×</button>
             </span>
         `).join('') || '<span class="txt-muted">-</span>';
 
@@ -445,8 +476,12 @@ function renderTableView() {
             const stCls = `st-${t.status.toLowerCase()}`;
             return `
                 <div class="table-task-row">
-                    <span class="task-status-indicator ${stCls}" onclick="updateTaskStatus('${t.id}')" title="Click to toggle status">${t.status}</span>
+                    <span class="task-status-indicator ${stCls}" onclick="updateTaskStatus('${t.id}')" title="Toggle status">${t.status}</span>
                     <span class="task-name-txt">${t.title}</span>
+                    <div class="table-task-actions">
+                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">✎</button>
+                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">✕</button>
+                    </div>
                 </div>
             `;
         }).join('') || '<span class="txt-muted">No tasks assigned</span>';
@@ -550,18 +585,48 @@ function openProjectModal(id = null) {
     formName.focus();
 }
 
-function openTaskModal(phase = 'Onboarding') {
+function openTaskModal(phase = 'Onboarding', taskId = null) {
     if (projects.length === 0) {
         showToast('Invalid Action', 'Create at least one project first.', true);
         return;
     }
     
+    const taskFormId = document.getElementById('edit-task-id');
+    const submitBtn = taskModal.querySelector('button[type="submit"]');
+    const titleEl = taskModal.querySelector('.modal-title');
     const projectSelect = document.getElementById('task-project-id');
-    projectSelect.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    const filterInput = document.getElementById('task-project-search');
+
+    // Force dynamic option generation once
+    const buildOpts = () => {
+        const query = filterInput.value.toLowerCase();
+        projectSelect.innerHTML = projects
+            .filter(p => p.name.toLowerCase().includes(query))
+            .map(p => `<option value="${p.id}">${p.name}</option>`)
+            .join('');
+    };
     
-    document.getElementById('task-phase').value = phase;
-    document.getElementById('task-title').value = '';
-    document.getElementById('task-labels').value = '';
+    filterInput.value = '';
+    filterInput.oninput = buildOpts;
+    buildOpts();
+
+    if (taskId) {
+        const task = tasks.find(t => t.id === taskId);
+        titleEl.innerHTML = `Edit <span class="accent">Task</span>`;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined">save</span> Save Revisions';
+        taskFormId.value = taskId;
+        projectSelect.value = task.projectId;
+        document.getElementById('task-phase').value = task.phase;
+        document.getElementById('task-title').value = task.title;
+        document.getElementById('task-labels').value = (task.labels || []).join(', ');
+    } else {
+        titleEl.innerHTML = `Create <span class="accent">Task</span>`;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined">rocket_launch</span> Deploy Task';
+        taskFormId.value = '';
+        document.getElementById('task-phase').value = phase;
+        document.getElementById('task-title').value = '';
+        document.getElementById('task-labels').value = '';
+    }
     
     taskModal.classList.remove('hidden');
 }
