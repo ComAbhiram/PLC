@@ -14,9 +14,9 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
-body { background-color: var(--brand-background); color: var(--brand-text); height: 100vh; overflow: hidden; zoom: 0.8; font-size: 16px; letter-spacing: -0.01em; line-height: 1.6; }
-/* Corrected height math to fully span the screen under 0.8 zoom scale */
-.app-container { display: flex; height: calc(100vh / 0.8); }
+body { background-color: var(--brand-background); color: var(--brand-text); min-height: 100dvh; display: flex; flex-direction: column; overflow-x: hidden; font-size: 16px; letter-spacing: -0.01em; line-height: 1.6; }
+/* Modern responsive layout container */
+.app-container { display: flex; flex: 1; height: 100dvh; width: 100vw; overflow: hidden; position: relative; }
 
 .sidebar { 
     width: 300px; 
@@ -1336,3 +1336,105 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 .skeleton-text { height: 14px; width: 80%; margin-bottom: 8px; }
 .skeleton-pill { height: 24px; width: 100%; border-radius: 20px; }
 
+
+/* --- MOBILE APP-LIKE RESPONSIVE ENGINE --- */
+
+@media (max-width: 1024px) {
+    .sidebar { width: 260px; }
+    .main-title { font-size: 20px; }
+}
+
+@media (max-width: 768px) {
+    .app-container { flex-direction: column; }
+    
+    /* Mobile Drawer Sidebar */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 2000;
+        transform: translateX(-100%);
+        box-shadow: 20px 0 50px rgba(0,0,0,0.2);
+        width: 85% !important;
+        max-width: 320px;
+    }
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(4px);
+        z-index: 1999;
+    }
+    .sidebar-overlay.active { display: block; }
+
+    /* Compact Header */
+    .top-header {
+        padding: 12px 16px !important;
+        height: auto !important;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .header-center { order: -1; width: 100%; text-align: center; }
+    .header-left { flex: 1; }
+    .header-right { flex: 1; justify-content: flex-end; }
+    
+    .main-title { font-size: 18px !important; }
+    .cta { padding: 8px 14px !important; font-size: 13px !important; }
+    
+    /* Table to Card Stack Transformation */
+    .table-view-container { padding: 12px !important; }
+    .milestone-table, .milestone-table thead, .milestone-table tbody, .milestone-table tr, .milestone-table td { 
+        display: block; 
+        width: 100%; 
+    }
+    .milestone-table thead { display: none; } /* Hide headers on mobile */
+    
+    .milestone-tr {
+        background: white !important;
+        margin-bottom: 16px;
+        border-radius: 20px;
+        border: 1px solid var(--brand-outline);
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .milestone-table td {
+        padding: 8px 0 !important;
+        border: none !important;
+    }
+    
+    .td-phase-header { margin-bottom: 12px; border-bottom: 1px solid var(--brand-outline); padding-bottom: 12px; }
+    
+    /* Labeling for card sections */
+    .milestone-table td:nth-of-type(2):before { content: "PROGRESS"; display: block; font-size: 9px; font-weight: 800; color: var(--brand-text-muted); margin-bottom: 6px; }
+    .milestone-table td:nth-of-type(3):before { content: "PROJECTS"; display: block; font-size: 9px; font-weight: 800; color: var(--brand-text-muted); margin-bottom: 6px; }
+    .milestone-table td:nth-of-type(4):before { content: "TASKS"; display: block; font-size: 9px; font-weight: 800; color: var(--brand-text-muted); margin-bottom: 6px; }
+
+    .table-projects-cell { display: flex; flex-wrap: wrap; gap: 8px; }
+    .table-proj-chip { margin: 0 !important; width: calc(50% - 4px); justify-content: space-between; }
+    
+    .table-add-btn { width: 100%; justify-content: center; background: #F1F5F9; padding: 12px; border-radius: 12px; margin-top: 12px; }
+    
+    /* Modal Responsive */
+    .modal-content {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        padding: 20px !important;
+    }
+    
+    /* Toast Mobile Positioning */
+    .toast-container {
+        top: auto !important;
+        bottom: 20px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+    }
+}

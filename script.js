@@ -60,11 +60,25 @@ async function syncData() {
 
 function setupEventListeners() {
     // Sidebar Toggle
+    // Sidebar Toggle (Mobile & Desktop)
     toggleSidebarBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        const icon = toggleSidebarBtn.querySelector('.material-symbols-outlined');
-        icon.textContent = sidebar.classList.contains('collapsed') ? 'menu' : 'menu_open';
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            const icon = toggleSidebarBtn.querySelector('.material-symbols-outlined');
+            icon.textContent = sidebar.classList.contains('collapsed') ? 'menu' : 'menu_open';
+        }
     });
+
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
 
     // Create Project Modal
     btnCreateProject.addEventListener('click', () => {
