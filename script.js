@@ -218,16 +218,13 @@ async function moveProject(id, column) {
     const proj = projects.find(p => p.id === id);
     if (!proj || proj.column === column) return;
 
-    const targetStr = column ? `phase: ${column}` : "the Project Vault";
-    if (confirm(`Move "${proj.name}" to ${targetStr}?`)) {
-        const { error } = await supabaseClient.from('projects')
-            .update({ phase_column: column, updated_at: new Date().toISOString() })
-            .eq('id', id);
-        
-        if (error) showToast('Transfer Blocked', 'Failed to move project.', true);
-        else showToast('Location Refined', column ? `Moved to ${column}` : 'Returned to Vault');
-        await reHydrateAndRender();
-    }
+    const { error } = await supabaseClient.from('projects')
+        .update({ phase_column: column, updated_at: new Date().toISOString() })
+        .eq('id', id);
+    
+    if (error) showToast('Transfer Blocked', 'Failed to move project.', true);
+    else showToast('Location Refined', column ? `Moved to ${column}` : 'Returned to Vault');
+    await reHydrateAndRender();
 }
 
 // Task Operations
