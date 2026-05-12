@@ -6,7 +6,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Local Cache / State
 let projects = [];
 let tasks = [];
-let currentView = 'vertical'; // 'vertical' or 'table'
+let currentView = 'table'; // 'table' is the sole interface now
 const COLUMNS = ['Onboarding', 'Design', 'Frontend', 'Backend', 'Beta', 'Live'];
 
 // DOM Elements Handlers
@@ -167,7 +167,7 @@ async function addProject(name, type, status = 'In Progress', priority = 'Medium
 
     const { error } = await supabaseClient.from('projects').insert([{
         name, type, status, priority, members,
-        phase_column: 'Onboarding'
+        phase_column: null
     }]);
     
     if (error) {
@@ -666,7 +666,7 @@ window.handleGvizSync = async function(response) {
                 status: 'In Progress',
                 priority: 'Medium',
                 members: ['GS'],
-                phase_column: 'Onboarding'
+                phase_column: null // Redirected from Onboarding to strictly Vault containment
             }]);
             if (!error) insertCount++;
         }

@@ -755,7 +755,7 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 
 /* View Mode Utilities & Animations */
 .view-toggle-group {
-    display: flex;
+    display: none !important; /* Locked to Table mode */
     align-items: center;
     gap: 4px;
     background: #F1F5F9;
