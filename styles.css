@@ -958,3 +958,35 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     transform: scale(1.1);
 }
 .txt-muted { color: var(--brand-text-muted); font-style: italic; opacity: 0.7; font-size: 11px; }
+
+/* Project Pill overrides for Sidebar */
+.project-pill {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 8px 12px !important;
+    min-height: 38px;
+    border-radius: 20px !important;
+    margin-bottom: 6px !important;
+    gap: 8px !important;
+}
+.project-pill .project-name {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+.project-pill .project-card-actions {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+.project-pill:hover .project-card-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Enforce strict scroll overflow behavior on list */
+.project-list {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    max-height: calc(100% - 200px); /* Force constraint to ensure scrolling triggers */
+}

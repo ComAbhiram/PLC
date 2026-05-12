@@ -276,40 +276,26 @@ function renderSidebar(searchQuery = '', sortBy = 'newest') {
 
     processed.forEach(project => {
         const card = document.createElement('div');
-        card.className = 'project-card';
+        card.className = 'project-card project-pill';
         card.draggable = true;
         
-        const stat = project.status || 'In Progress';
-        const statClass = stat.toLowerCase().replace(/\s+/g, '-');
-        const memHTML = (project.members || ['U']).map((m, i) => `<div class="avatar" style="background: hsla(${i * 125}, 65%, 45%, 1); z-index:${10-i}">${m}</div>`).join('');
-
         card.innerHTML = `
-            <div class="project-card-row">
-                <span class="project-name" title="${project.name}">${highlight(project.name)}</span>
-                <div class="project-card-actions">
-                    <button class="mini-btn edit-q" aria-label="Edit Project"><span class="material-symbols-outlined" style="font-size:16px">edit</span></button>
-                    <button class="mini-btn del-q" aria-label="Delete Project"><span class="material-symbols-outlined" style="font-size:16px">delete</span></button>
-                </div>
-            </div>
-            <div class="project-card-row" style="justify-content: flex-start; gap:6px; margin-top:-4px;">
-                <span class="project-meta">${highlight(project.type)}</span>
-                <span class="status-chip ${statClass}">${stat}</span>
-            </div>
-            <div class="project-card-footer">
-                <div class="avatar-stack">${memHTML}</div>
-                <span class="last-updated">${getTimeSpan(project.updatedAt || project.createdAt)}</span>
+            <span class="project-name" title="${project.name}">${highlight(project.name)}</span>
+            <div class="project-card-actions">
+                <button class="mini-btn edit-q"><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
+                <button class="mini-btn del-q"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button>
             </div>
         `;
 
-        card.addEventListener('click', () => openProjectModal(project.id));
-        card.querySelector('.edit-q').addEventListener('click', (e) => { e.stopPropagation(); openProjectModal(project.id); });
-        card.querySelector('.del-q').addEventListener('click', (e) => { e.stopPropagation(); if(confirm(`Delete project: ${project.name}?`)) deleteProject(project.id); });
+        card.onclick = () => openProjectModal(project.id);
+        card.querySelector('.edit-q').onclick = (e) => { e.stopPropagation(); openProjectModal(project.id); };
+        card.querySelector('.del-q').onclick = (e) => { e.stopPropagation(); if(confirm(`Delete ${project.name}?`)) deleteProject(project.id); };
         
         card.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', project.id);
-            card.classList.add('dragging');
+            card.style.opacity = '0.5';
         });
-        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+        card.addEventListener('dragend', () => { card.style.opacity = '1'; });
 
         projectList.appendChild(card);
     });
@@ -641,12 +627,16 @@ window.handleGvizSync = async function(response) {
         
         const rows = response.table.rows;
         
-        // Filter and extract names safely, guarding against null cells or headers
+        // Filter, extract and SANITIZE names (purging garbage CSV lines)
         const sheetNames = rows
             .map(row => {
                 if (!row.c || !row.c[0]) return null;
-                const val = row.c[0].v;
-                return val ? String(val).trim() : null;
+                let val = row.c[0].v;
+                if (!val) return null;
+                val = String(val).trim();
+                // Robust Garbage Defense: ignore long descriptions or multi-comma CSV leaks
+                if (val.length > 70 || (val.match(/,/g) || []).length > 2) return null;
+                return val;
             })
             .filter(n => n && n.toLowerCase() !== 'project name');
 
