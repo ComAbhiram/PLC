@@ -2088,3 +2088,51 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 [data-theme="dark"] .history-table th {
     background: #0F172A;
 }
+
+/* --- VIEW TOGGLE STYLES --- */
+.view-toggles {
+    display: flex;
+    background: #F1F5F9;
+    padding: 4px;
+    border-radius: 10px;
+    gap: 4px;
+    border: 1px solid var(--brand-outline);
+}
+
+.view-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--brand-text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-btn:hover {
+    background: white;
+    color: var(--brand-primary);
+}
+
+.view-btn.active {
+    background: white;
+    color: var(--brand-primary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .view-toggles {
+    background: #1E293B;
+}
+[data-theme="dark"] .view-btn.active {
+    background: #334155;
+}
+
+/* --- FIX FOR EMPTY TIMELINE --- */
+.timeline-container {
+    width: 100%;
+    min-height: 400px; /* Ensure it's never 0 height */
+}
