@@ -1117,3 +1117,20 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 .milestone-tr:nth-child(4) .phase-num { background: #F59E0B !important; }
 .milestone-tr:nth-child(5) .phase-num { background: #10B981 !important; }
 .milestone-tr:nth-child(6) .phase-num { background: #3B82F6 !important; }
+
+/* ABSOLUTE SIDEBAR SCROLL ENFORCEMENT */
+.sidebar-section {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important; /* Crucial for nested flex scrolling */
+    overflow: hidden !important;
+}
+
+.project-list {
+    flex: 1 1 auto !important;
+    height: 1px !important; /* Triggers true relative-to-parent flexbox height allocation */
+    min-height: 0 !important;
+    max-height: none !important; /* Disable static maximums in favor of pure flex growth */
+    overflow-y: auto !important;
+}
