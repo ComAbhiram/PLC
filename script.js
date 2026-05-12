@@ -502,7 +502,7 @@ function renderTimeline() {
                              <div class="project-tooltip">
                                  <p class="tooltip-title">Matrix Health</p>
                                  <div style="margin-bottom:6px;font-weight:800;color:#10b981;">V-Scale: ${progress}%</div>
-                                 ${colProjects.length > 0 ? colProjects.map(p => `<div style="font-size:9px;opacity:0.9;">ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ${p.name}</div>`).join('') : '<div style="font-size:9px;opacity:0.5;">- Ready -</div>'}
+                                 ${colProjects.length > 0 ? colProjects.map(p => `<div style="font-size:9px;opacity:0.9;">&#8226; ${p.name}</div>`).join('') : '<div style="font-size:9px;opacity:0.5;">- Ready -</div>'}
                              </div>
                          </div>
                          <div style="width: 100px; height: 3px; background: #f3f4f6; border-radius: 10px; margin: 10px auto 0; overflow: hidden;">
@@ -600,7 +600,7 @@ function renderTableView() {
                       ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" 
                       onclick="openProjectModal('${p.id}')">
                     ${p.name}
-                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">✕</button>
+                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">&#10005;</button>
                 </span>
             `;
         }).join('');
@@ -629,8 +629,8 @@ function renderTableView() {
                     <span class="task-project-tag" style="background-color: ${bg}; color: ${text};" title="Project: ${projName}">${projName}</span>
                     <span class="task-name-txt">${t.title}</span>
                     <div class="table-task-actions">
-                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">✎</button>
-                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">✕</button>
+                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">&#9998;</button>
+                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">&#10005;</button>
                     </div>
                 </div>
             `;
@@ -706,6 +706,7 @@ function renderTableView() {
             moveProject(id, row.dataset.phase);
         });
     });
+}
 
 function toggleCard(card) {
     card.classList.toggle('collapsed');
@@ -1004,108 +1005,6 @@ function renderRecordsView() {
                 </div>
             </div>
         `;
-    });
-    
-    html += '</div>';
-    timeline.innerHTML = html;
-
-    const btnRecords = document.getElementById('btn-view-records');
-    if (btnRecords) btnRecords.classList.add('active');
-}
-
-    const filtered = projects.filter(p => p.name.toLowerCase().includes(recordsSearchQuery.toLowerCase()));
-    const totalPages = Math.ceil(filtered.length / RECORDS_PER_PAGE);
-    const start = (recordsPage - 1) * RECORDS_PER_PAGE;
-    const paged = filtered.slice(start, start + RECORDS_PER_PAGE);
-
-    let html = \
-        <div class="records-header">
-            <h2>Project <span class="accent">Archives</span></h2>
-            <p>Historical audit trails for every vault item.</p>
-        </div>
-        
-        <div class="records-controls">
-            <div class="records-search-wrapper">
-                <span class="material-symbols-outlined">search</span>
-                <input type="text" class="records-search-input" placeholder="Search case files..." 
-                       value="\" oninput="handleRecordsSearch(this.value)">
-            </div>
-            
-            <div class="pagination-controls">
-                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Previous</button>
-                <span class="pag-info">Page \ of \</span>
-                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Next</button>
-            </div>
-        </div>
-    \;
-
-    html += '<div class="folder-grid">';
-    
-    paged.forEach(p => {
-        const hue = getProjectHue(p.name);
-        const taskCount = tasks.filter(t => t.projectId === p.id).length;
-        html += \
-            <div class="folder-card" onclick="viewProjectRecord('\')">
-                <div class="folder-icon" style="color: hsl(\, 70%, 45%)">
-                    <span class="material-symbols-outlined" style="font-size: 64px;">folder</span>
-                </div>
-                <div class="folder-info">
-                    <div class="folder-name">\</div>
-                    <div class="folder-meta">\ Activities Recorded</div>
-                </div>
-            </div>
-        \;
-    });
-    
-    html += '</div>';
-    timeline.innerHTML = html;
-
-    const btnRecords = document.getElementById('btn-view-records');
-    if (btnRecords) btnRecords.classList.add('active');
-}
-
-    const filtered = projects.filter(p => p.name.toLowerCase().includes(recordsSearchQuery.toLowerCase()));
-    const totalPages = Math.ceil(filtered.length / RECORDS_PER_PAGE);
-    const start = (recordsPage - 1) * RECORDS_PER_PAGE;
-    const paged = filtered.slice(start, start + RECORDS_PER_PAGE);
-
-    let html = \
-        <div class="records-header">
-            <h2>Project <span class="accent">Archives</span></h2>
-            <p>Historical audit trails for every vault item.</p>
-        </div>
-        
-        <div class="records-controls">
-            <div class="records-search-wrapper">
-                <span class="material-symbols-outlined">search</span>
-                <input type="text" class="records-search-input" placeholder="Search case files..." 
-                       value="\" oninput="handleRecordsSearch(this.value)">
-            </div>
-            
-            <div class="pagination-controls">
-                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Previous</button>
-                <span class="pag-info">Page \ of \</span>
-                <button class="pag-btn" \ onclick="changeRecordsPage(\)">Next</button>
-            </div>
-        </div>
-    \;
-
-    html += '<div class="folder-grid">';
-    
-    paged.forEach(p => {
-        const hue = getProjectHue(p.name);
-        const taskCount = tasks.filter(t => t.projectId === p.id).length;
-        html += \
-            <div class="folder-card" onclick="viewProjectRecord('\')">
-                <div class="folder-icon" style="color: hsl(\, 70%, 45%)">
-                    <span class="material-symbols-outlined" style="font-size: 64px;">folder</span>
-                </div>
-                <div class="folder-info">
-                    <div class="folder-name">\</div>
-                    <div class="folder-meta">\ Activities Recorded</div>
-                </div>
-            </div>
-        \;
     });
     
     html += '</div>';
