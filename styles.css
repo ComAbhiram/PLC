@@ -1868,9 +1868,25 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
 
 /* --- TASK ALIGNMENT REPAIR --- */
 .table-task-row {
-    grid-template-columns: 80px auto 1fr 60px !important;
+    display: grid !important;
+    grid-template-columns: 80px 100px 1fr 60px !important;
     gap: 16px !important;
-    padding: 10px 14px !important;
+    padding: 12px 14px !important;
+    border-bottom: 1px solid var(--brand-outline);
+    transition: background-color 0.2s;
+    align-items: center;
+}
+
+.table-task-row:last-child {
+    border-bottom: none;
+}
+
+.table-task-row:hover {
+    background-color: #F8FAFC;
+}
+
+[data-theme="dark"] .table-task-row:hover {
+    background-color: #334155;
 }
 
 .task-project-tag {
