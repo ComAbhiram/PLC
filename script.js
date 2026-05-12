@@ -564,7 +564,17 @@ function renderTableView() {
                     <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">×</button>
                 </span>
             `;
-        }).join('') || '<span class="txt-muted">-</span>';
+        }).join('');
+
+        const projectToggleHTML = `
+            <div class="project-toggle-container">
+                <button class="project-count-toggle" onclick="toggleProjectList(this)">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    ${colProjects.length} Projects
+                </button>
+                <div class="table-projects-cell hidden">${projectsHTML || '<span class="txt-muted">No projects assigned</span>'}</div>
+            </div>
+        `;
 
         const tasksHTML = colTasks.map(t => {
             const stCls = `st-${t.status.toLowerCase()}`;
@@ -617,7 +627,7 @@ function renderTableView() {
                     </div>
                 </td>
                 <td>
-                    <div class="table-projects-cell">${projectsHTML}</div>
+                    <div class="table-projects-cell-wrapper">${projectToggleHTML}</div>
                 </td>
                 <td>
                     <div class="table-tasks-cell">${tasksHTML}</div>
@@ -714,15 +724,20 @@ function openTaskModal(phase = 'Onboarding', taskId = null) {
     const projectSelect = document.getElementById('task-project-id');
     const filterInput = document.getElementById('task-project-search');
 
+    // Contextual projects for this phase
+    const phaseProjects = projects.filter(p => p.column === phase);
+
     // Force dynamic option generation once
     const buildOpts = () => {
         const query = filterInput.value.toLowerCase();
-        const options = projects
+        // If it's a new task, only show projects in this phase. If editing, show all just in case.
+        const source = taskId ? projects : phaseProjects;
+        const options = source
             .filter(p => p.name.toLowerCase().includes(query))
             .map(p => `<option value="${p.id}">${p.name}</option>`)
             .join('');
         
-        projectSelect.innerHTML = options || '<option disabled>No matches found</option>';
+        projectSelect.innerHTML = options || '<option disabled>No projects in this phase</option>';
     };
     
     filterInput.value = '';
@@ -881,4 +896,10 @@ async function syncGoogleSheets(silent = false) {
     };
 
     document.head.appendChild(script);
+}
+
+function toggleProjectList(btn) {
+    const cell = btn.nextElementSibling;
+    cell.classList.toggle('hidden');
+    btn.classList.toggle('active');
 }

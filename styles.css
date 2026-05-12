@@ -1925,3 +1925,45 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     font-size: 9px !important;
     margin-top: 2px;
 }
+
+/* --- PROJECT LIST PROGRESSIVE DISCLOSURE --- */
+.project-count-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #F1F5F9;
+    border: 1px solid var(--brand-outline);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.project-count-toggle:hover {
+    background: #E2E8F0;
+    color: var(--brand-primary);
+}
+
+.project-count-toggle.active {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
+    margin-bottom: 8px;
+}
+
+.project-count-toggle .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.table-projects-cell-wrapper {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+}
+
+.table-projects-cell.hidden {
+    display: none;
+}
