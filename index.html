@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body class="light-mode">
     <div id="app" class="app-container">
@@ -86,6 +87,9 @@
                     <div class="divider" style="width:1px; height:24px; background:var(--brand-outline);"></div>
                     <button id="btn-sync-sheet" class="icon-btn" title="Sync from Sheet" style="padding: 8px; border-radius: 8px;">
                         <span class="material-symbols-outlined" id="sync-icon">sync</span>
+                    </button>
+                    <button id="btn-toggle-theme" class="icon-btn" title="Toggle Dark Mode">
+                        <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
                     </button>
                     <button id="btn-create-project" class="cta">
                         <span class="hover-underline-animation"> Draft Project </span>

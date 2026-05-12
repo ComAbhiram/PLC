@@ -176,6 +176,25 @@ function setupEventListeners() {
     if(btnSync) {
         btnSync.addEventListener('click', () => syncGoogleSheets());
     }
+
+    // Theme Toggle
+    const btnTheme = document.getElementById('btn-toggle-theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (btnTheme) {
+        btnTheme.addEventListener('click', () => {
+            const isDark = document.body.parentElement.getAttribute('data-theme') === 'dark';
+            document.body.parentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
+            localStorage.setItem('plc-theme', isDark ? 'light' : 'dark');
+        });
+        
+        // Initial load
+        const saved = localStorage.getItem('plc-theme');
+        if (saved === 'dark') {
+            document.body.parentElement.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = 'light_mode';
+        }
+    }
 }
 
 // Project Operations
@@ -223,7 +242,17 @@ async function moveProject(id, column) {
         .eq('id', id);
     
     if (error) showToast('Transfer Blocked', 'Failed to move project.', true);
-    else showToast('Location Refined', column ? `Moved to ${column}` : 'Returned to Vault');
+    else {
+        showToast('Location Refined', column ? `Moved to ${column}` : 'Returned to Vault');
+        if (column === 'Live') {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#6366F1', '#EC4899', '#10B981']
+            });
+        }
+    }
     await reHydrateAndRender();
 }
 
@@ -502,6 +531,15 @@ function renderTableView() {
             `;
         }).join('') || '<span class="txt-muted">No tasks assigned</span>';
 
+        const openCount = colTasks.filter(t => t.status === 'Open').length;
+        const progCount = colTasks.filter(t => t.status === 'In Progress').length;
+        const closedCount = colTasks.filter(t => t.status === 'Closed').length;
+        const total = colTasks.length || 1;
+        
+        const openPct = Math.round((openCount / total) * 100);
+        const progPct = Math.round((progCount / total) * 100);
+        const closedPct = Math.round((closedCount / total) * 100);
+
         html += `
             <tr class="milestone-tr" data-phase="${col}">
                 <td>
@@ -511,8 +549,15 @@ function renderTableView() {
                     </div>
                 </td>
                 <td>
-                    <div class="table-progress-wrapper" title="${progress}% Completed">
-                        <div class="table-progress-bar" style="width:${progress}%"></div>
+                    <div class="dist-tooltip">
+                        <span><i class="dot dist-open"></i>${openCount}</span>
+                        <span><i class="dot dist-progress"></i>${progCount}</span>
+                        <span><i class="dot dist-closed"></i>${closedCount}</span>
+                    </div>
+                    <div class="task-dist-container" title="Tasks: ${openCount} Open, ${progCount} In Progress, ${closedCount} Closed">
+                        <div class="dist-seg dist-open" style="width:${openPct}%"></div>
+                        <div class="dist-seg dist-progress" style="width:${progPct}%"></div>
+                        <div class="dist-seg dist-closed" style="width:${closedPct}%"></div>
                     </div>
                 </td>
                 <td>
@@ -750,7 +795,7 @@ window.handleGvizSync = async function(response) {
         console.error("Gviz Parse Fail:", err);
         showToast('Sync Process Fail', 'Could not decode worksheet logic.', true);
     } finally {
-        if (syncIcon) syncIcon.classList.remove('spinning');
+        if (syncIcon) syncIcon.classList.remove('sync-spin');
         // Clean up dynamic script if found
         const old = document.getElementById('gviz-sync-script');
         if(old) old.remove();
@@ -759,7 +804,7 @@ window.handleGvizSync = async function(response) {
 
 async function syncGoogleSheets(silent = false) {
     const syncIcon = document.getElementById('sync-icon');
-    if (syncIcon) syncIcon.classList.add('spinning');
+    if (syncIcon) syncIcon.classList.add('sync-spin');
     
     // Purge old script if it exists to allow re-runs
     const existing = document.getElementById('gviz-sync-script');
