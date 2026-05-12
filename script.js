@@ -426,11 +426,11 @@ function renderActiveView() {
 function updateStats() {
     const totalProjects = projects.length;
     const liveProjects = projects.filter(p => p.column === 'Live').length;
-    const activeTasks = tasks.filter(t => t.status !== 'Closed').length;
+    const activeProjects = projects.filter(p => p.column && p.column !== 'Live').length;
 
     document.getElementById('stat-total-projects').textContent = totalProjects;
     document.getElementById('stat-live-count').textContent = liveProjects;
-    document.getElementById('stat-task-count').textContent = activeTasks;
+    document.getElementById('stat-active-projects').textContent = activeProjects;
 }
 
 function renderTimeline() {
