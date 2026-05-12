@@ -1900,3 +1900,28 @@ mark.highlight { background: #FDE68A; color: #92400E; padding: 0 1px; border-rad
     gap: 8px;
     width: 100%;
 }
+
+/* --- COMPACT STATS DASHBOARD --- */
+.stats-grid {
+    margin-bottom: 20px !important;
+}
+
+.stat-card {
+    padding: 14px 20px !important;
+    border-radius: 16px !important;
+}
+
+.stat-label {
+    margin-bottom: 2px !important;
+    font-size: 10px !important;
+}
+
+.stat-value {
+    font-size: 24px !important;
+    margin-bottom: 0 !important;
+}
+
+.stat-trend {
+    font-size: 9px !important;
+    margin-top: 2px;
+}
