@@ -549,9 +549,17 @@ function renderTableView() {
         const progress = colTasks.length > 0 ? Math.round((closed / colTasks.length) * 100) : 0;
         
         const projectsHTML = colProjects.map(p => {
-            const prioClass = p.priority ? `priority-${p.priority.toLowerCase()}` : '';
+            const hue = getProjectHue(p.name);
+            const bg = `hsl(${hue}, 85%, 95%)`;
+            const border = `hsl(${hue}, 50%, 85%)`;
+            const text = `hsl(${hue}, 90%, 25%)`;
+            
             return `
-                <span class="table-proj-chip ${prioClass}" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" onclick="openProjectModal('${p.id}')">
+                <span class="table-proj-chip" 
+                      style="background-color: ${bg}; border-color: ${border}; color: ${text};"
+                      draggable="true" 
+                      ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" 
+                      onclick="openProjectModal('${p.id}')">
                     ${p.name}
                     <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">×</button>
                 </span>
@@ -562,10 +570,14 @@ function renderTableView() {
             const stCls = `st-${t.status.toLowerCase()}`;
             const proj = projects.find(p => p.id === t.projectId);
             const projName = proj ? proj.name : 'Unknown';
+            const hue = proj ? getProjectHue(projName) : 0;
+            const bg = proj ? `hsl(${hue}, 85%, 95%)` : '#F1F5F9';
+            const text = proj ? `hsl(${hue}, 90%, 25%)` : '#475569';
+
             return `
                 <div class="table-task-row">
                     <span class="task-status-indicator ${stCls}" onclick="updateTaskStatus('${t.id}')" title="Toggle status">${t.status}</span>
-                    <span class="task-project-tag" title="Project: ${projName}">${projName}</span>
+                    <span class="task-project-tag" style="background-color: ${bg}; color: ${text};" title="Project: ${projName}">${projName}</span>
                     <span class="task-name-txt">${t.title}</span>
                     <div class="table-task-actions">
                         <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">✎</button>
