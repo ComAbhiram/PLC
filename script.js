@@ -1,4 +1,4 @@
-// Initialize Supabase Connection
+﻿// Initialize Supabase Connection
 const SUPABASE_URL = 'https://oipqynnhgpwqgywpkwxk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pcHF5bm5oZ3B3cWd5d3Brd3hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NTU3NDUsImV4cCI6MjA5NDEzMTc0NX0.kfwNygfTLFEcnZqJS-z-SB-9Kuazqk80s9bAJ_z6_M8';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -6,16 +6,22 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Local Cache / State
 let projects = [];
 let tasks = [];
-let currentView = 'table'; // 'table' is the sole interface now
+let currentView = 'table';
 const COLUMNS = ['Onboarding', 'Design', 'Frontend', 'Backend', 'Beta', 'Live'];
 
 function getProjectHue(str) {
     let hash = 0;
-    const cleanStr = str ? String(str) : \"default\";
+    const cleanStr = str ? String(str) : "default";
     for (let i = 0; i < cleanStr.length; i++) {
         hash = cleanStr.charCodeAt(i) + ((hash << 5) - hash);
     }
     return Math.abs(hash) % 360;
+}
+
+async function reHydrateAndRender() {
+    await syncData();
+    renderSidebar();
+    renderActiveView();
 }
 
 // DOM Elements Handlers
@@ -493,7 +499,7 @@ function renderTimeline() {
                              <div class="project-tooltip">
                                  <p class="tooltip-title">Matrix Health</p>
                                  <div style="margin-bottom:6px;font-weight:800;color:#10b981;">V-Scale: ${progress}%</div>
-                                 ${colProjects.length > 0 ? colProjects.map(p => `<div style="font-size:9px;opacity:0.9;">• ${p.name}</div>`).join('') : '<div style="font-size:9px;opacity:0.5;">- Ready -</div>'}
+                                 ${colProjects.length > 0 ? colProjects.map(p => `<div style="font-size:9px;opacity:0.9;">Ã¢â‚¬Â¢ ${p.name}</div>`).join('') : '<div style="font-size:9px;opacity:0.5;">- Ready -</div>'}
                              </div>
                          </div>
                          <div style="width: 100px; height: 3px; background: #f3f4f6; border-radius: 10px; margin: 10px auto 0; overflow: hidden;">
@@ -591,7 +597,7 @@ function renderTableView() {
                       ondragstart="event.dataTransfer.setData('text/plain', '${p.id}')" 
                       onclick="openProjectModal('${p.id}')">
                     ${p.name}
-                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">×</button>
+                    <button class="chip-remove-btn" onclick="event.stopPropagation(); moveProject('${p.id}', null)" title="Return to Vault">Ãƒâ€”</button>
                 </span>
             `;
         }).join('');
@@ -620,8 +626,8 @@ function renderTableView() {
                     <span class="task-project-tag" style="background-color: ${bg}; color: ${text};" title="Project: ${projName}">${projName}</span>
                     <span class="task-name-txt">${t.title}</span>
                     <div class="table-task-actions">
-                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">✎</button>
-                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">✕</button>
+                        <button class="task-action-ico" onclick="event.stopPropagation(); openTaskModal('${col}', '${t.id}')" title="Edit Task">Ã¢Å“Å½</button>
+                        <button class="task-action-ico danger" onclick="event.stopPropagation(); if(confirm('Delete task?')) deleteTask('${t.id}')" title="Delete Task">Ã¢Å“â€¢</button>
                     </div>
                 </div>
             `;
