@@ -67,7 +67,7 @@ async function bootstrap() {
     renderSidebar();
     renderActiveView();
     setupEventListeners();
-    
+
     // Auto sync from sheet on bootstrap if available
     setTimeout(() => syncGoogleSheets(true), 1000);
 }
@@ -79,17 +79,17 @@ async function syncData() {
     const { data: pData, error: pErr } = await supabaseClient.from('projects').select('*');
     const { data: tData, error: tErr } = await supabaseClient.from('tasks').select('*');
     const { data: rData, error: rErr } = await supabaseClient.from('task_repository').select('*');
-    
+
     if (pErr) console.error('Projects fail:', pErr);
     if (tErr) console.error('Tasks fail:', tErr);
-    
+
     projects = (pData || []).map(p => ({
         ...p,
         column: p.phase_column,
         createdAt: p.created_at,
         updatedAt: p.updated_at
     }));
-    
+
     tasks = (tData || []).map(t => ({
         ...t,
         projectId: t.project_id,
@@ -225,11 +225,11 @@ function setupEventListeners() {
             e.preventDefault();
             const id = document.getElementById('edit-pre-task-id').value;
             const name = document.getElementById('pre-task-name').value;
-            
+
             let success = false;
             if (id) success = await updatePreTask(id, name);
             else success = await addPreTask(name);
-            
+
             if (success) closeModals();
         });
     }
@@ -237,7 +237,7 @@ function setupEventListeners() {
     // Project Search
     const vaultSearch = document.getElementById('vault-search');
     const sortSelect = document.getElementById('project-sort');
-    
+
     if (vaultSearch) {
         vaultSearch.addEventListener('input', () => {
             renderSidebar(vaultSearch.value, sortSelect?.value || 'newest');
@@ -285,13 +285,13 @@ function setupEventListeners() {
     const btnRecords = document.getElementById('btn-view-records');
     const btnRecordsHeader = document.getElementById('btn-view-records-header');
 
-    if(btnVertical && btnTable) {
+    if (btnVertical && btnTable) {
         btnVertical.addEventListener('click', () => {
             currentView = 'vertical';
             selectedRecordProject = null;
             btnVertical.classList.add('active');
             btnTable.classList.remove('active');
-            if(btnRecordsHeader) btnRecordsHeader.classList.remove('active');
+            if (btnRecordsHeader) btnRecordsHeader.classList.remove('active');
             renderActiveView();
         });
         btnTable.addEventListener('click', () => {
@@ -299,7 +299,7 @@ function setupEventListeners() {
             selectedRecordProject = null;
             btnTable.classList.add('active');
             btnVertical.classList.remove('active');
-            if(btnRecordsHeader) btnRecordsHeader.classList.remove('active');
+            if (btnRecordsHeader) btnRecordsHeader.classList.remove('active');
             renderActiveView();
         });
     }
@@ -307,16 +307,16 @@ function setupEventListeners() {
     const switchToRecords = () => {
         currentView = 'records';
         selectedRecordProject = null;
-        if(btnTable) btnTable.classList.remove('active');
-        if(btnVertical) btnVertical.classList.remove('active');
-        if(btnRecordsHeader) btnRecordsHeader.classList.add('active');
+        if (btnTable) btnTable.classList.remove('active');
+        if (btnVertical) btnVertical.classList.remove('active');
+        if (btnRecordsHeader) btnRecordsHeader.classList.add('active');
         renderActiveView();
     };
 
-    if(btnRecords) btnRecords.addEventListener('click', switchToRecords);
-    if(btnRecordsHeader) btnRecordsHeader.addEventListener('click', switchToRecords);
+    if (btnRecords) btnRecords.addEventListener('click', switchToRecords);
+    if (btnRecordsHeader) btnRecordsHeader.addEventListener('click', switchToRecords);
 
-    if(btnSync) {
+    if (btnSync) {
         btnSync.addEventListener('click', () => syncGoogleSheets());
     }
 
@@ -331,7 +331,7 @@ function setupEventListeners() {
             themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
             localStorage.setItem('plc-theme', isDark ? 'light' : 'dark');
         });
-        
+
         // Initial load
         const saved = localStorage.getItem('plc-theme');
         if (saved === 'dark') {
@@ -344,7 +344,7 @@ function setupEventListeners() {
 // Project Operations
 // Project Operations
 async function addProject(name, type, status = 'In Progress', priority = 'Medium') {
-    const allPool = ['JD','SK','MP','AL','BV'];
+    const allPool = ['JD', 'SK', 'MP', 'AL', 'BV'];
     const count = Math.floor(Math.random() * 2) + 1;
     const members = allPool.sort(() => 0.5 - Math.random()).slice(0, count);
 
@@ -352,7 +352,7 @@ async function addProject(name, type, status = 'In Progress', priority = 'Medium
         name, type, status, priority, members,
         phase_column: null
     }]);
-    
+
     if (error) {
         showToast('Push Failed', 'Unable to initialize project in cloud.', true);
     } else {
@@ -389,7 +389,7 @@ async function moveProject(id, column) {
     const { error } = await supabaseClient.from('projects')
         .update({ phase_column: column, updated_at: new Date().toISOString() })
         .eq('id', id);
-    
+
     if (error) showToast('Transfer Blocked', 'Failed to move project.', true);
     else {
         showToast('Location Refined', column ? `Moved to ${column}` : 'Returned to Vault');
@@ -431,25 +431,25 @@ async function updateTask(id, updates) {
 
 async function updateTaskStatus(id, newStatus = null) {
     const task = tasks.find(t => t.id === id);
-    if(!task) return;
-    
+    if (!task) return;
+
     let targetStatus = newStatus;
     if (!targetStatus) {
         const order = ['Open', 'Ongoing', 'Closed'];
         let current = task.status;
         if (current === 'In Progress' || current === 'Progress') current = 'Ongoing';
         if (current === 'Done' || current === 'Completed') current = 'Closed';
-        
+
         let nextIdx = order.indexOf(current);
         if (nextIdx === -1) nextIdx = 0;
         else nextIdx = (nextIdx + 1) % order.length;
         targetStatus = order[nextIdx];
     }
-    
+
     const { error } = await supabaseClient.from('tasks')
         .update({ status: targetStatus })
         .eq('id', id);
-    
+
     if (error) showToast('Status Fail', 'Failed to update task state.', true);
     await reHydrateAndRender();
 }
@@ -519,7 +519,7 @@ async function handleTaskKey(e, id) {
 // Rendering
 function renderSidebar(searchQuery = '', sortBy = 'newest') {
     if (!projectList || !taskRepoList) return;
-    
+
     if (activeSidebarTab === 'projects') {
         renderProjectSidebar(searchQuery, sortBy);
     } else {
@@ -534,7 +534,7 @@ function renderProjectSidebar(searchQuery = '', sortBy = 'newest') {
         tabProj.innerHTML = `Projects <span class="tab-badge">${projects.length}</span>`;
     }
 
-    let processed = projects.filter(p => 
+    let processed = projects.filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.type && p.type.toLowerCase().includes(searchQuery.toLowerCase()))
     );
@@ -577,8 +577,8 @@ function renderProjectSidebar(searchQuery = '', sortBy = 'newest') {
 
         card.onclick = () => openProjectModal(project.id);
         card.querySelector('.edit-q').onclick = (e) => { e.stopPropagation(); openProjectModal(project.id); };
-        card.querySelector('.del-q').onclick = (e) => { e.stopPropagation(); if(confirm(`Delete ${project.name}?`)) deleteProject(project.id); };
-        
+        card.querySelector('.del-q').onclick = (e) => { e.stopPropagation(); if (confirm(`Delete ${project.name}?`)) deleteProject(project.id); };
+
         card.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('project', project.id);
             card.style.opacity = '0.5';
@@ -592,23 +592,23 @@ function switchSidebarTab(tab) {
     activeSidebarTab = tab;
     const btnAddPre = document.getElementById('btn-add-pre-task');
     const sortSel = document.getElementById('project-sort');
-    
+
     document.getElementById('tab-projects').classList.toggle('active', tab === 'projects');
     document.getElementById('tab-tasks').classList.toggle('active', tab === 'tasks');
-    
+
     projectList.classList.toggle('hidden', tab !== 'projects');
     taskRepoList.classList.toggle('hidden', tab !== 'tasks');
-    
+
     if (btnAddPre) btnAddPre.classList.toggle('hidden', tab !== 'tasks');
     if (sortSel) sortSel.classList.toggle('hidden', tab !== 'projects');
-    
+
     renderSidebar();
 }
 
 function renderTaskSidebar(searchQuery = '', sortBy = 'newest') {
     taskRepoList.innerHTML = '';
     let filtered = preTasks.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+
     document.getElementById('pre-task-count').textContent = preTasks.length;
 
     // Sorting Logic
@@ -641,16 +641,16 @@ function renderTaskSidebar(searchQuery = '', sortBy = 'newest') {
                 <button class="mini-btn del-repo" title="Delete Template"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button>
             </div>
         `;
-        
+
         item.querySelector('.edit-repo').onclick = (e) => { e.stopPropagation(); openPreTaskModal(task.id); };
-        item.querySelector('.del-repo').onclick = (e) => { e.stopPropagation(); if(confirm(`Delete "${task.name}" template?`)) deletePreTask(task.id); };
+        item.querySelector('.del-repo').onclick = (e) => { e.stopPropagation(); if (confirm(`Delete "${task.name}" template?`)) deletePreTask(task.id); };
 
         item.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('common-task', task.name);
             item.style.opacity = '0.5';
         });
         item.addEventListener('dragend', () => { item.style.opacity = '1'; });
-        
+
         taskRepoList.appendChild(item);
     });
 }
@@ -745,7 +745,7 @@ async function deleteProject(id) {
     await supabaseClient.from('tasks').delete().eq('project_id', id);
     // 2. Delete project
     const { error } = await supabaseClient.from('projects').delete().eq('id', id);
-    
+
     if (error) {
         console.error('Delete Project Fail:', error);
         showToast('Sync Error', `Could not delete project: ${error.message}`, true);
@@ -790,20 +790,20 @@ function updateStats() {
 function renderTimeline() {
     timeline.innerHTML = '';
     timeline.className = 'timeline-container vertical-stack'; // Force vertical class
-    
+
     const flowWrapper = document.createElement('div');
     flowWrapper.className = 'timeline-flow-vertical';
-    
+
     COLUMNS.forEach((col, index) => {
         const colProjects = projects.filter(p => p.column === col);
         const colTasks = tasks.filter(t => t.phase === col);
-        
+
         const closedTasks = colTasks.filter(t => t.status === 'Closed').length;
         const progress = colTasks.length > 0 ? Math.round((closedTasks / colTasks.length) * 100) : 0;
 
         const milestone = document.createElement('div');
         milestone.className = 'milestone-item vertical';
-        
+
         milestone.innerHTML = `
             <div class="phase-card theme-${index + 1} collapsed" data-phase="${col}" onclick="toggleCard(this)">
                 <div class="uiv-header vertical-layout">
@@ -834,15 +834,15 @@ function renderTimeline() {
                 <div class="phase-card-extended">
                     <div class="task-list custom-scrollbar">
                         ${colTasks.length > 0 ? colTasks.map((task, i) => {
-                            const project = projects.find(p => p.id === task.projectId);
-                            const stClass = `st-${task.status.toLowerCase()}`;
-                            const labelHTML = (task.labels || []).map(lbl => `<span class="task-label-pill">${lbl}</span>`).join('');
-                            
-                            return `
+            const project = projects.find(p => p.id === task.projectId);
+            const stClass = `st-${task.status.toLowerCase()}`;
+            const labelHTML = (task.labels || []).map(lbl => `<span class="task-label-pill">${lbl}</span>`).join('');
+
+            return `
                                 <div class="task-item" id="task-item-${task.id}">
                                     <div class="task-title-row">
                                         <div class="task-content">
-                                            <span style="color: #94A3B8; font-weight: 600;">#${i+1}</span>
+                                            <span style="color: #94A3B8; font-weight: 600;">#${i + 1}</span>
                                             <span class="task-title-text" onclick="startInlineEdit('${task.id}')">${task.title}</span>
                                             <input type="text" class="task-edit-input hidden" value="${task.title}" onkeyup="handleTaskKey(event, '${task.id}')" onblur="cancelInlineEdit('${task.id}')">
                                             <div class="task-subtitle">${project ? project.name : 'Standalone'}</div>
@@ -874,7 +874,7 @@ function renderTimeline() {
                                     </div>
                                 </div>
                             `;
-                        }).join('') : `<div class="empty-msg">No tasks yet</div>`}
+        }).join('') : `<div class="empty-msg">No tasks yet</div>`}
                     </div>
                 </div>
             </div>
@@ -887,7 +887,7 @@ function renderTimeline() {
             e.preventDefault(); card.classList.remove('drag-active');
             const projId = e.dataTransfer.getData('project');
             const commonTask = e.dataTransfer.getData('common-task');
-            
+
             if (projId) moveProject(projId, col);
             else if (commonTask) promptProjectSelection(col, commonTask);
         });
@@ -895,9 +895,9 @@ function renderTimeline() {
         // Functional Enhancement: Button toggles expansion
         const detailsBtn = milestone.querySelector('.uiv-btn-primary');
         if (detailsBtn) {
-            detailsBtn.onclick = (e) => { 
-                e.stopPropagation(); 
-                toggleCard(card); 
+            detailsBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleCard(card);
             };
         }
 
@@ -910,7 +910,7 @@ function renderTimeline() {
 function renderTableView() {
     timeline.innerHTML = '';
     timeline.className = 'timeline-container table-view-container';
-    
+
     let html = `
         <div class="milestone-table-wrapper">
             <table class="milestone-table">
@@ -925,19 +925,19 @@ function renderTableView() {
                 </thead>
                 <tbody>
     `;
-    
+
     COLUMNS.forEach((col, idx) => {
         const colProjects = projects.filter(p => p.column === col);
         const colTasks = tasks.filter(t => t.phase === col);
         const closed = colTasks.filter(t => t.status === 'Closed').length;
         const progress = colTasks.length > 0 ? Math.round((closed / colTasks.length) * 100) : 0;
-        
+
         const projectsHTML = colProjects.map(p => {
             const hue = getProjectHue(p.name);
             const bg = `hsl(${hue}, 85%, 95%)`;
             const border = `hsl(${hue}, 50%, 85%)`;
             const text = `hsl(${hue}, 90%, 25%)`;
-            
+
             return `
                 <div class="project-stat-container">
                     <span class="table-proj-chip" 
@@ -1012,16 +1012,16 @@ function renderTableView() {
         const progCount = colTasks.filter(t => t.status === 'In Progress').length;
         const closedCount = colTasks.filter(t => t.status === 'Closed').length;
         const total = colTasks.length || 1;
-        
+
         const openPct = Math.round((openCount / total) * 100);
         const progPct = Math.round((progCount / total) * 100);
         const closedPct = Math.round((closedCount / total) * 100);
 
         html += `
-            <tr class="milestone-tr theme-${idx+1}" data-phase="${col}">
+            <tr class="milestone-tr theme-${idx + 1}" data-phase="${col}">
                 <td>
-                    <div class="td-phase-header theme-${idx+1}">
-                        <span class="phase-num">${idx+1}</span>
+                    <div class="td-phase-header theme-${idx + 1}">
+                        <span class="phase-num">${idx + 1}</span>
                         <span class="phase-name">${col} <span class="phase-count-badge" onclick="toggleProjectList(this.closest('tr').querySelector('.project-count-toggle'))" title="Quick View Projects">${colProjects.length}</span></span>
                     </div>
                 </td>
@@ -1082,14 +1082,14 @@ function promptProjectSelection(phase, taskTitle) {
     const selectorModal = document.getElementById('project-selector-modal');
     const selectorList = document.getElementById('project-selector-list');
     const selectorSub = document.getElementById('selector-subtitle');
-    
+
     if (!selectorModal || !selectorList) return;
 
     if (phaseProjects.length === 0) {
         showToast('No Projects', `Move a project to ${phase} first.`, true);
         return;
     }
-    
+
     if (selectorSub) selectorSub.textContent = `Assigning "${taskTitle}" to ${phase}`;
 
     selectorList.innerHTML = phaseProjects.map(p => `
@@ -1098,7 +1098,7 @@ function promptProjectSelection(phase, taskTitle) {
             ${p.name}
         </button>
     `).join('');
-    
+
     selectorModal.classList.remove('hidden');
 }
 
@@ -1121,7 +1121,7 @@ async function reHydrateAndRender() {
 }
 
 function getIconForType(type) {
-    switch(type) {
+    switch (type) {
         case 'Mobile': return 'smartphone';
         case 'Design': return 'palette';
         default: return 'language';
@@ -1133,7 +1133,7 @@ function openProjectModal(id = null) {
     const submitText = document.getElementById('project-submit-text');
     const formId = document.getElementById('edit-project-id');
     const formName = document.getElementById('project-name');
-    
+
     if (id) {
         const project = projects.find(p => p.id === id);
         title.innerHTML = `Edit <span class="accent">Project</span>`;
@@ -1154,7 +1154,7 @@ function openProjectModal(id = null) {
         document.getElementById('project-priority').value = 'Medium';
         typeBtns.forEach(b => b.classList.toggle('active', b.dataset.type === 'Web'));
     }
-    
+
     projectModal.classList.remove('hidden');
     formName.focus();
 }
@@ -1164,7 +1164,7 @@ function openTaskModal(phase = 'Onboarding', taskId = null) {
         showToast('Invalid Action', 'Create at least one project first.', true);
         return;
     }
-    
+
     const taskFormId = document.getElementById('edit-task-id');
     const submitBtn = taskModal.querySelector('button[type="submit"]');
     const titleEl = taskModal.querySelector('.modal-title');
@@ -1183,10 +1183,10 @@ function openTaskModal(phase = 'Onboarding', taskId = null) {
             .filter(p => p.name.toLowerCase().includes(query))
             .map(p => `<option value="${p.id}">${p.name}</option>`)
             .join('');
-        
+
         projectSelect.innerHTML = options || '<option disabled>No projects in this phase</option>';
     };
-    
+
     filterInput.value = '';
     filterInput.oninput = buildOpts;
     buildOpts();
@@ -1214,19 +1214,19 @@ function openTaskModal(phase = 'Onboarding', taskId = null) {
         document.getElementById('task-title').value = '';
         document.getElementById('task-labels').value = '';
     }
-    
+
     taskModal.classList.remove('hidden');
 }
 
 function closeModals() {
     if (projectModal) projectModal.classList.add('hidden');
     if (taskModal) taskModal.classList.add('hidden');
-    
+
     const preTask = document.getElementById('pre-task-modal');
     if (preTask) preTask.classList.add('hidden');
-    
+
     if (quickViewModal) quickViewModal.classList.add('hidden');
-    
+
     const selector = document.getElementById('project-selector-modal');
     if (selector) selector.classList.add('hidden');
 }
@@ -1247,8 +1247,8 @@ function showToast(title, message, isError = false) {
     const entry = document.createElement('div');
     entry.className = 'toast-entry';
     entry.style.transition = 'all 0.3s ease';
-    
-    const icon = isError 
+
+    const icon = isError
         ? `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>`
         : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>`;
 
@@ -1264,7 +1264,7 @@ function showToast(title, message, isError = false) {
             </button>
         </div>
     `;
-    
+
     container.appendChild(entry);
 
     // Auto dispose
@@ -1278,15 +1278,15 @@ function showToast(title, message, isError = false) {
 }
 
 // Google Sheets Engine - REENGINEERED TO JSONP TO BYPASS CORS COMPLETELY
-window.handleGvizSync = async function(response) {
+window.handleGvizSync = async function (response) {
     const syncIcon = document.getElementById('sync-icon');
     try {
         if (!response || !response.table || !response.table.rows) {
             throw new Error("Invalid Gviz payload");
         }
-        
+
         const rows = response.table.rows;
-        
+
         // Filter, extract and SANITIZE names (purging garbage CSV lines)
         const sheetNames = rows
             .map(row => {
@@ -1332,14 +1332,14 @@ window.handleGvizSync = async function(response) {
         if (syncIcon) syncIcon.classList.remove('sync-spin');
         // Clean up dynamic script if found
         const old = document.getElementById('gviz-sync-script');
-        if(old) old.remove();
+        if (old) old.remove();
     }
 };
 
 async function syncGoogleSheets(silent = false) {
     const syncIcon = document.getElementById('sync-icon');
     if (syncIcon) syncIcon.classList.add('sync-spin');
-    
+
     // Purge old script if it exists to allow re-runs
     const existing = document.getElementById('gviz-sync-script');
     if (existing) existing.remove();
@@ -1349,7 +1349,7 @@ async function syncGoogleSheets(silent = false) {
     const script = document.createElement('script');
     script.id = 'gviz-sync-script';
     script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGvizSync&gid=190319038&t=${Date.now()}`;
-    
+
     script.onerror = () => {
         if (syncIcon) syncIcon.classList.remove('spinning');
         if (!silent) showToast('Fetch Blocked', 'Network refused gviz endpoint.', true);
@@ -1363,15 +1363,15 @@ function openQuickView(title, subtitle, content) {
     const titleEl = document.getElementById('quick-view-title');
     const subEl = document.getElementById('quick-view-subtitle');
     const contEl = document.getElementById('quick-view-content');
-    
+
     if (titleEl) titleEl.innerHTML = title.replace(' ', ' <span class="accent">') + '</span>';
     if (subEl) subEl.textContent = subtitle;
-    
+
     // Wrap content in a styled container
     if (contEl) {
         contEl.innerHTML = `<div class="quick-view-grid-wrap animate-slide-up">${content}</div>`;
     }
-    
+
     if (quickViewModal) quickViewModal.classList.remove('hidden');
 }
 
@@ -1410,7 +1410,7 @@ let selectedRecordProject = null;
 function renderRecordsView() {
     timeline.innerHTML = '';
     timeline.className = 'timeline-container records-view';
-    
+
     if (selectedRecordProject) {
         renderProjectHistory(selectedRecordProject);
         return;
@@ -1443,7 +1443,7 @@ function renderRecordsView() {
     `;
 
     html += '<div class="folder-grid">';
-    
+
     paged.forEach(p => {
         const hue = getProjectHue(p.name);
         const taskCount = tasks.filter(t => t.projectId === p.id).length;
@@ -1459,7 +1459,7 @@ function renderRecordsView() {
             </div>
         `;
     });
-    
+
     html += '</div>';
     timeline.innerHTML = html;
 
@@ -1507,7 +1507,7 @@ function clearProjectRecord() {
 function renderProjectHistory(id) {
     const project = projects.find(p => p.id === id);
     const projTasks = tasks.filter(t => t.projectId === id);
-    
+
     let html = `
         <div class="history-view animate-slide-up">
             <div class="history-header">
@@ -1532,7 +1532,7 @@ function renderProjectHistory(id) {
                     </thead>
                     <tbody>
     `;
-    
+
     if (projTasks.length === 0) {
         html += '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--brand-text-muted);">No activity history found for this project.</td></tr>';
     } else {
@@ -1550,7 +1550,7 @@ function renderProjectHistory(id) {
             `;
         });
     }
-    
+
     html += `
                     </tbody>
                 </table>
