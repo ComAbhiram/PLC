@@ -384,7 +384,31 @@ async function deleteProject(id) {
 
 async function moveProject(id, column) {
     const proj = projects.find(p => p.id === id);
-    if (!proj || proj.column === column) return;
+    if (!proj) return;
+
+    if (proj.column === column) {
+        // Find the phase element and trigger shake on the label
+        const selectors = [
+            `[data-phase="${column}"] .uiv-title`,
+            `[data-phase="${column}"] .phase-name`,
+            `[data-phase="${column}"]`
+        ];
+        
+        let applied = false;
+        for (const sel of selectors) {
+            const targets = document.querySelectorAll(sel);
+            if (targets.length > 0) {
+                targets.forEach(t => {
+                    t.classList.add('shake-error');
+                    setTimeout(() => t.classList.remove('shake-error'), 800);
+                });
+                applied = true;
+                break; 
+            }
+        }
+        showToast('Action Blocked', `${proj.name} is already in the ${column} phase.`, true);
+        return;
+    }
 
     const { error } = await supabaseClient.from('projects')
         .update({ phase_column: column, updated_at: new Date().toISOString() })
