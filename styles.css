@@ -321,7 +321,7 @@ body { background-color: var(--brand-background); color: var(--brand-text); heig
 .search-box input:focus { border-color: var(--brand-primary); background: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08); }
 .search-icon { position: absolute; left: 12px; color: var(--brand-text-muted); font-size: 20px; pointer-events: none; }
 
-.filter-actions { display: flex; gap: 8px; align-items: center; }
+.filter-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
 .mini-select { 
     flex: 1; 
     padding: 8px 12px; 
@@ -337,22 +337,27 @@ body { background-color: var(--brand-background); color: var(--brand-text); heig
 }
 .mini-select:hover { border-color: var(--brand-primary); }
 
-.mini-add-btn { 
-    background: var(--brand-primary); 
-    color: white; 
-    border: none; 
-    width: 32px; 
-    height: 32px; 
-    border-radius: 10px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+.mini-add-btn {
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    width: 100%;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     cursor: pointer;
-    transition: 0.2s;
-    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-top: 6px;
 }
-.mini-add-btn:hover { transform: scale(1.1); filter: brightness(1.1); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3); }
-.mini-add-btn span { font-size: 20px; }
+.mini-add-btn:hover { filter: brightness(1.1); box-shadow: 0 6px 18px rgba(99, 102, 241, 0.38); transform: translateY(-1px); }
+.mini-add-btn span { font-size: 18px; }
 .stat-label { font-size: 11px; font-weight: 800; color: var(--brand-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
 .stat-value { font-size: 32px; font-weight: 900; color: var(--brand-text); margin-bottom: 4px; }
 .stat-trend { font-size: 10px; font-weight: 800; color: #10B981; display: flex; align-items: center; gap: 4px; }
