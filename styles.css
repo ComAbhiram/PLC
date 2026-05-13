@@ -798,6 +798,30 @@ body { background-color: var(--brand-background); color: var(--brand-text); heig
 .task-name-txt:hover, .task-title-text:hover { border-bottom-color: var(--brand-primary-light); color: var(--brand-primary); }
 
 /* Navigation items */
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: var(--brand-text-muted); text-decoration: none; font-size: 14px; font-weight: 700; transition: var(--transition); border-radius: 12px; margin: 2px 12px; }
+.nav-item:hover { background: var(--brand-primary-light); color: var(--brand-primary); }
+.nav-item.active { background: var(--brand-primary); color: white; }
+.nav-item i { font-size: 20px; }
+
+/* Shake Error Animation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake-error {
+    display: inline-block !important;
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both !important;
+    outline: 2px solid #ef4444 !important;
+    outline-offset: 6px;
+    border-radius: 4px;
+    color: #ef4444 !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3) !important;
+    z-index: 10;
+    position: relative;
+}
+
 .nav-menu { margin-top: auto; padding-top: 20px; }
 .nav-item { 
     width: auto;
