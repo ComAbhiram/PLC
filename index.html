@@ -26,40 +26,41 @@
                 </button>
             </div>
 
-            <div class="sidebar-section">
-                <div class="section-header">
-                    <span class="section-title">Project Vault</span>
-                    <span id="project-count" class="badge">0</span>
+            <div class="sidebar-content">
+                <div class="sidebar-header-tabs">
+                    <button id="tab-projects" class="sidebar-tab active" onclick="switchSidebarTab('projects')">
+                        Projects <span id="vault-count" class="tab-badge">0</span>
+                    </button>
+                    <button id="tab-tasks" class="sidebar-tab" onclick="switchSidebarTab('tasks')">
+                        Tasks <span id="pre-task-count" class="tab-badge">0</span>
+                    </button>
                 </div>
-                
-                <!-- Filter & Search -->
-                <div class="sidebar-controls">
-                    <div class="search-container">
+
+                <div class="sidebar-search-area">
+                    <div class="search-box">
                         <span class="material-symbols-outlined search-icon">search</span>
-                        <input type="text" id="project-search" placeholder="Search projects..." aria-label="Search Projects">
+                        <input type="text" id="vault-search" placeholder="Search items...">
                     </div>
-                    <div class="filter-row">
-                        <select id="project-sort" class="minimal-select" aria-label="Sort Projects">
+                    <div class="filter-actions">
+                        <select id="project-sort" class="mini-select">
                             <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
                             <option value="alpha">Alphabetical</option>
                         </select>
+                        <button id="btn-add-pre-task" class="mini-add-btn hidden" title="New Template">
+                            <span class="material-symbols-outlined">add</span>
+                        </button>
                     </div>
                 </div>
 
                 <div id="project-list" class="project-list custom-scrollbar">
                     <!-- Projects will be injected here -->
                 </div>
+                <div id="task-repo-list" class="project-list custom-scrollbar hidden">
+                    <!-- Tasks will be injected here -->
+                </div>
             </div>
 
             <div class="sidebar-footer">
-                <div class="system-tip">
-                    <div class="tip-header">
-                        <span class="material-symbols-outlined">lightbulb</span>
-                        <p class="tip-title">System Tip</p>
-                    </div>
-                    <p class="tip-text">Drag projects from here to milestones to advance the cycle.</p>
-                </div>
                 <nav class="nav-menu">
                     <button id="btn-view-records" class="nav-item">
                         <span class="material-symbols-outlined">inventory_2</span>
@@ -253,15 +254,75 @@
                         <input type="text" id="task-labels" placeholder="E.g. urgent, debug">
                         <small style="color:var(--brand-text-muted); font-size:10px; margin-top:4px; display:block;">Separate unique tags with commas.</small>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-full">
-                        <span class="material-symbols-outlined">add_task</span>
-                        <span>Assign Task</span>
+                    <button type="submit" class="btn-deploy btn-full">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                        <span>Deploy Task</span>
                     </button>
                 </form>
             </div>
         </div>
     </div>
-    <div id="toast-container"></div>
+        <!-- Pre-Task Modal -->
+        <div id="pre-task-modal" class="modal-overlay hidden">
+            <div class="modal-card animate-slide-up" style="width: 380px;">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="modal-title">Repo <span class="accent">Item</span></h3>
+                        <p class="modal-subtitle">Lifecycle Template Task</p>
+                    </div>
+                    <button class="modal-close icon-btn" onclick="closeModals()">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="pre-task-form" class="modal-form">
+                    <input type="hidden" id="edit-pre-task-id">
+                    <div class="form-group">
+                        <label for="pre-task-name">Task Name <span style="color:#E11D48">*</span></label>
+                        <input type="text" id="pre-task-name" placeholder="E.g. Code Review" required>
+                    </div>
+                    <button type="submit" class="btn-deploy btn-full">
+                        <span class="material-symbols-outlined">save</span>
+                        <span id="pre-task-submit-text">Save to Repository</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick View Modal -->
+        <div id="quick-view-modal" class="modal-overlay hidden">
+            <div class="modal-card animate-slide-up" style="width: 520px; max-height: 80vh; display: flex; flex-direction: column;">
+                <div class="modal-header" style="margin-bottom: 20px;">
+                    <div>
+                        <h3 class="modal-title" id="quick-view-title">Quick <span class="accent">View</span></h3>
+                        <p class="modal-subtitle" id="quick-view-subtitle">Items in this phase</p>
+                    </div>
+                    <button class="modal-close icon-btn" id="close-quick-view">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div id="quick-view-content" class="custom-scrollbar" style="overflow-y: auto; flex: 1; padding: 10px 4px;">
+                    <!-- Content dynamic -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Selector Modal -->
+        <div id="project-selector-modal" class="modal-overlay hidden">
+            <div class="modal-card animate-slide-up" style="width: 380px;">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="modal-title">Select <span class="accent">Project</span></h3>
+                        <p class="modal-subtitle" id="selector-subtitle">Assigning task to phase</p>
+                    </div>
+                </div>
+                <div id="project-selector-list" class="custom-scrollbar" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 300px; overflow-y: auto;">
+                    <!-- Projects dynamic -->
+                </div>
+                <button class="uiv-btn-secondary" style="margin-top: 20px; width: 100%;" onclick="closeModals()">Cancel</button>
+            </div>
+        </div>
+
+        <div id="toast-container"></div>
     <script src="script.js"></script>
 </body>
 </html>
