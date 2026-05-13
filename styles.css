@@ -875,25 +875,38 @@ body { background-color: var(--brand-background); color: var(--brand-text); heig
 .history-view { width: 100%; animation: slideUp 0.5s ease-out; }
 .history-header { display: flex; align-items: center; gap: 30px; margin-bottom: 40px; }
 .back-btn { 
-    width: 48px; 
-    height: 48px; 
-    border-radius: 16px; 
+    width: auto; 
+    padding: 10px 24px;
+    height: auto; 
+    border-radius: 100px; 
     background: white; 
     border: 1px solid var(--brand-outline); 
-    display: flex; 
+    display: inline-flex; 
     align-items: center; 
     justify-content: center; 
+    gap: 12px;
     cursor: pointer; 
-    transition: 0.2s; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--brand-text);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
-.back-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); transform: translateX(-4px); }
+.back-btn:hover { 
+    border-color: var(--brand-primary); 
+    color: var(--brand-primary); 
+    transform: translateX(-6px); 
+    background: var(--brand-primary-light);
+    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.1);
+}
 .history-title h3 { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
 .history-title p { color: var(--brand-text-muted); font-size: 12px; font-weight: 700; }
 
-.history-table-wrapper { background: white; border-radius: 24px; border: 1px solid var(--brand-outline); overflow: hidden; box-shadow: var(--shadow-premium); }
-.history-table th { padding: 18px 24px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brand-text-muted); border-bottom: 1px solid var(--brand-outline); }
+.history-table-wrapper { background: white; border-radius: 28px; border: 1px solid var(--brand-outline); overflow: hidden; box-shadow: var(--shadow-premium); width: 100%; margin-top: 20px; }
+.history-table { width: 100%; border-collapse: collapse; text-align: left; }
+.history-table th { padding: 18px 24px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brand-text-muted); border-bottom: 1px solid var(--brand-outline); text-align: left; background: #F8FAFC; }
 .history-table td { padding: 20px 24px; border-bottom: 1px solid #F1F5F9; font-size: 13px; font-weight: 600; }
-.history-date { color: var(--brand-text-muted); font-family: monospace; font-size: 12px; }
+.history-date { color: var(--brand-text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 .history-phase { font-weight: 900; color: var(--brand-primary); }
 .history-task { color: var(--brand-text); }
 
